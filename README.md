@@ -2,11 +2,7 @@
 
 <!-- PROJECT LOGO / TITLE -->
 <h1>
-<<<<<<< HEAD
   <img src="docs/logo.png" alt="AEGIS FORENSICS Mascot" width="120" /><br/>
-=======
-  <img src="frontend/public/favicon.svg" alt="AEGIS" width="56" /><br/>
-
   AEGIS FORENSICS
 </h1>
 
