@@ -1,0 +1,90 @@
+# =============================================================
+#  AEGIS FORENSICS — .gitignore
+# =============================================================
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# ── Environment & Secrets ─────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Database (local runtime data) ─────────────────────────────
+backend/storage/forensics.db
+backend/storage/forensics.db-shm
+backend/storage/forensics.db-wal
+
+# ── Runtime Storage (generated artifacts & uploads) ───────────
+# Keep the directory structure but ignore generated content
+backend/storage/artifacts/
+backend/storage/uploads/
+backend/storage/reports/
+
+# ── Large Dataset (49 MB CSV — not required to run) ───────────
+# The model is pre-trained; dataset not needed to run the app.
+# Store in Google Drive / Kaggle if needed for re-training.
+Phishing_Email.csv
+
+# ── Model file ────────────────────────────────────────────────
+# 2.26 MB — SAFE to commit to GitHub (under 50 MB limit).
+# If it ever grows beyond 50 MB, switch to Git LFS:
+#   git lfs track "*.joblib"
+# phishing_email_model.joblib   ← DO NOT gitignore this; it is needed to run
+
+# ── Backup directory ──────────────────────────────────────────
+backups/
+
+# ── Node / Frontend ───────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/dist-ssr/
+*.local
+
+# ── Testing & Coverage ────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+*.coveragerc
+
+# ── IDE & Editor ──────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Jupyter Notebooks (optional — remove if you want to keep) ─
+# Uncomment below to exclude the notebook from the repo
+# *.ipynb
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Misc ──────────────────────────────────────────────────────
+*.tmp
+*.bak
+.mypy_cache/
+.ruff_cache/
