@@ -23,3 +23,4 @@ Add screenshots of the running application here.
 3. Use your system screenshot tool (Win+Shift+S on Windows).
 4. Save PNGs here with the filenames above.
 5. The README.md already references these paths — they will render automatically on GitHub.
+
