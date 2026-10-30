@@ -6,7 +6,7 @@
   <img src="docs/logo.png" alt="AEGIS FORENSICS Mascot" width="120" /><br/>
 =======
   <img src="frontend/public/favicon.svg" alt="AEGIS" width="56" /><br/>
->>>>>>> 878ebbdbf16f1426a59ec5077915d935b78d4c44
+
   AEGIS FORENSICS
 </h1>
 
