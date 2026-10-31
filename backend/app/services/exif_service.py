@@ -1,5 +1,5 @@
 from PIL import Image, ExifTags
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 SUSPICIOUS_SOFTWARE = [
     "photoshop", "gimp", "canva", "lightroom", "snapseed", "picsart", "facetune",
@@ -10,12 +10,13 @@ class ExifService:
     @staticmethod
     def extract_exif(pil_img: Image.Image) -> Dict[str, Any]:
         """
-        Safely extracts EXIF metadata from a PIL Image.
-        Returns parsed fields, anomaly flags, and raw tags.
+        Safely extracts EXIF metadata, GPS details, and anomalies from a PIL Image.
+        Returns parsed fields, anomaly flags, GPS info, and raw tags.
         """
         raw_tags = {}
         anomaly_flags = []
         has_exif = False
+        gps_info = None
 
         make = None
         model = None
@@ -46,6 +47,16 @@ class ExifService:
                 datetime_orig = raw_tags.get("DateTimeOriginal") or raw_tags.get("DateTime")
                 software = raw_tags.get("Software")
 
+                # Parse GPS if present
+                if "GPSInfo" in raw_tags:
+                    gps_raw = raw_tags["GPSInfo"]
+                    gps_info = {
+                        "present": True,
+                        "raw": str(gps_raw)[:300],
+                        "summary": "Geotagging metadata preserved in file"
+                    }
+                    anomaly_flags.append("Geographic location coordinates (GPSInfo) detected in image metadata.")
+
                 # Check for software tampering traces
                 if software:
                     sw_lower = str(software).lower()
@@ -71,6 +82,7 @@ class ExifService:
             "image_height": height,
             "has_exif": has_exif,
             "anomaly_flags": anomaly_flags,
+            "gps_info": gps_info,
             "raw_tags": {k: str(v)[:100] for k, v in list(raw_tags.items())[:25]}
         }
 

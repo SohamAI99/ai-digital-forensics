@@ -3,6 +3,7 @@ import numpy as np
 import pytest
 from PIL import Image
 import io
+import hashlib
 from backend.app.services.image_preprocessor import image_preprocessor_service
 from backend.app.services.exif_service import exif_service
 from backend.app.services.frequency_analyzer import frequency_analyzer_service
@@ -27,6 +28,15 @@ def test_image_validation_valid():
     assert img_bgr.shape == (100, 100, 3)
     assert meta["width"] == 100
     assert meta["height"] == 100
+    assert "sha256" in meta
+    assert meta["sha256"] == hashlib.sha256(data).hexdigest()
+
+def test_image_sha256_integrity():
+    data = create_synthetic_image_bytes(80, 80)
+    expected_hash = hashlib.sha256(data).hexdigest()
+    _, _, meta = image_preprocessor_service.validate_and_load(data, "integrity_test.jpg")
+    assert meta["sha256"] == expected_hash
+    assert len(meta["sha256"]) == 64
 
 def test_image_validation_corrupt():
     corrupt_data = b"NOT_A_VALID_IMAGE_HEADER_BYTES"

@@ -54,3 +54,28 @@ def test_email_risk_engine_scoring():
     assert risk_level == "High Risk"
     assert score >= 70.0
     assert len(evidence) >= 3
+
+def test_email_parser_headers_and_reply_to_mismatch():
+    raw_email = (
+        "From: boss@legitcompany.com\r\n"
+        "To: employee@legitcompany.com\r\n"
+        "Reply-To: attacker@spoofeddomain.net\r\n"
+        "Subject: Urgent wire transfer request\r\n"
+        "Message-ID: <wire-9912@legitcompany.com>\r\n"
+        "Received: from relay1.net by mx.legitcompany.com\r\n\r\n"
+        "Please process this wire transfer immediately."
+    )
+    parsed = email_parser_service.parse_text_or_headers(raw_email)
+    assert parsed["sender"] == "boss@legitcompany.com"
+    assert parsed["reply_to"] == "attacker@spoofeddomain.net"
+    assert parsed["message_id"] == "<wire-9912@legitcompany.com>"
+    assert parsed["reply_to_mismatch"] is True
+    assert parsed["received_hops"] >= 1
+
+    # Verify risk engine flags this mismatch as high severity evidence
+    _, _, evidence, _, _, _ = email_risk_engine.assess_risk(
+        {"phishing_probability": 0.5}, {}, [], [], {}, parsed_info=parsed
+    )
+    mismatch_ev = [e for e in evidence if e.category == "headers" and "Reply-To" in e.title]
+    assert len(mismatch_ev) == 1
+    assert mismatch_ev[0].severity == "high"

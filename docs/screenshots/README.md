@@ -22,8 +22,4 @@ Add screenshots of the running application here.
 2. Run some test analyses so data is populated.
 3. Use your system screenshot tool (Win+Shift+S on Windows).
 4. Save PNGs here with the filenames above.
-5. The README.md already references these paths — they will render automatically on GitHub.
-<<<<<<< HEAD
 
-=======
->>>>>>> 878ebbdbf16f1426a59ec5077915d935b78d4c44

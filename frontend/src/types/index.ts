@@ -24,6 +24,7 @@ export interface UrlFinding {
 export interface AttachmentFinding {
   filename: string;
   extension: string;
+  mime_type?: string;
   size_bytes: number;
   sha256: string;
   risk_level: 'High' | 'Medium' | 'Low';
@@ -63,8 +64,12 @@ export interface EmailAnalyzeResponse {
   parsed_metadata: {
     sender?: string | null;
     recipient?: string | null;
+    reply_to?: string | null;
     subject?: string | null;
     date?: string | null;
+    message_id?: string | null;
+    received_hops?: number;
+    reply_to_mismatch?: boolean;
     body_snippet?: string;
   };
   writing_style: WritingStyleAnalysis;
@@ -89,6 +94,7 @@ export interface ExifMetadata {
   has_exif: boolean;
   anomaly_flags: string[];
   raw_tags: Record<string, any>;
+  gps_info?: Record<string, any> | null;
 }
 
 export interface FrequencyMetrics {
@@ -104,6 +110,7 @@ export interface ImageAnalyzeResponse {
   analysis_id: string;
   timestamp: string;
   filename: string;
+  sha256: string;
   file_size_bytes: number;
   dimensions: [number, number];
   prediction: string;

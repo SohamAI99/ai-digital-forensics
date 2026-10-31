@@ -75,14 +75,15 @@ async def analyze_email(
     # 5. Recorded Auth Headers
     auth_headers = parsed_info.get("authentication_headers", {})
 
-    # 6. Multi-Factor Risk Assessment
+    # 6. Multi-Factor Risk Assessment (including header discrepancies)
     risk_level, overall_score, evidence, checks_performed, checks_unavailable, limitations = (
         email_risk_engine.assess_risk(
             model_res,
             writing_style,
             urls_analysis,
             attachments,
-            auth_headers
+            auth_headers,
+            parsed_info=parsed_info
         )
     )
 
@@ -122,7 +123,17 @@ async def analyze_email(
         "urls_count": len(urls_found),
         "attachments_count": len(attachments),
         "writing_style": writing_style,
-        "evidence_count": len(evidence)
+        "evidence_count": len(evidence),
+        "sender": parsed_info.get("sender"),
+        "recipient": parsed_info.get("recipient"),
+        "reply_to": parsed_info.get("reply_to"),
+        "subject": parsed_info.get("subject"),
+        "message_id": parsed_info.get("message_id"),
+        "received_hops": parsed_info.get("received_hops", 0),
+        "spf_result": auth_headers.get("spf_result", "Unknown"),
+        "dkim_result": auth_headers.get("dkim_result", "None"),
+        "dmarc_result": auth_headers.get("dmarc_result", "None"),
+        "evidence_list": [ev.model_dump() for ev in evidence]
     }
     insert_analysis(
         analysis_id=analysis_id,
@@ -148,8 +159,12 @@ async def analyze_email(
         parsed_metadata={
             "sender": parsed_info.get("sender"),
             "recipient": parsed_info.get("recipient"),
+            "reply_to": parsed_info.get("reply_to"),
             "subject": parsed_info.get("subject"),
             "date": parsed_info.get("date"),
+            "message_id": parsed_info.get("message_id"),
+            "received_hops": parsed_info.get("received_hops", 0),
+            "reply_to_mismatch": parsed_info.get("reply_to_mismatch", False),
             "body_snippet": raw_content[:300] + ("..." if len(raw_content) > 300 else "")
         },
         writing_style=WritingStyleAnalysis(**writing_style),
