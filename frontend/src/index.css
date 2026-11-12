@@ -20,44 +20,44 @@
 :root,
 html.dark {
   color-scheme: dark;
-  --bg-app: #0b0f19;
-  --bg-sidebar: #0d1322;
-  --bg-header: #0f172a;
-  --bg-card: #0f172a;
-  --bg-inset: #0b0f19;
-  --bg-subtle: #1e293b;
-  --border-theme: #1e293b;
-  --border-theme-subtle: #334155;
-  --border-input: #334155;
-  --text-main: #cbd5e1;
-  --text-heading: #ffffff;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --bg-app: #0c0e14;
+  --bg-sidebar: #090b10;
+  --bg-header: #0c0e14;
+  --bg-card: #111520;
+  --bg-inset: #0c0e14;
+  --bg-subtle: #181c27;
+  --border-theme: rgba(238, 240, 245, 0.08);
+  --border-theme-subtle: rgba(238, 240, 245, 0.14);
+  --border-input: rgba(238, 240, 245, 0.14);
+  --text-main: #a3a9b8;
+  --text-heading: #eef0f5;
+  --text-muted: #7a8296;
+  --text-dim: #515a6e;
+  --card-shadow: none;
   --modal-overlay: rgba(0, 0, 0, 0.75);
-  --scrollbar-track: #0f172a;
-  --scrollbar-thumb: #1e293b;
-  --scrollbar-thumb-hover: #334155;
+  --scrollbar-track: #0c0e14;
+  --scrollbar-thumb: #181c27;
+  --scrollbar-thumb-hover: #262c3d;
 }
 
 html.light {
   color-scheme: light;
-  --bg-app: #f8fafc;
+  --bg-app: #f5f7fa;
   --bg-sidebar: #ffffff;
   --bg-header: #ffffff;
   --bg-card: #ffffff;
-  --bg-inset: #f1f5f9;
-  --bg-subtle: #f1f5f9;
-  --border-theme: #e2e8f0;
-  --border-theme-subtle: #cbd5e1;
-  --border-input: #cbd5e1;
-  --text-main: #334155;
-  --text-heading: #0f172a;
-  --text-muted: #64748b;
+  --bg-inset: #f0f2f6;
+  --bg-subtle: #eceff4;
+  --border-theme: rgba(17, 24, 39, 0.08);
+  --border-theme-subtle: rgba(17, 24, 39, 0.14);
+  --border-input: rgba(17, 24, 39, 0.14);
+  --text-main: #4b5565;
+  --text-heading: #111827;
+  --text-muted: #6b7487;
   --text-dim: #94a3b8;
-  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --modal-overlay: rgba(15, 23, 42, 0.45);
-  --scrollbar-track: #f8fafc;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --modal-overlay: rgba(17, 24, 39, 0.45);
+  --scrollbar-track: #f5f7fa;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-hover: #94a3b8;
 }
@@ -71,7 +71,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1), color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Custom adaptive scrollbar */
@@ -152,34 +152,7 @@ body {
 }
 
 .theme-transition {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Forensic glow and glass accents */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-html.light .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.glass-panel-elevated {
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-}
-
-html.light .glass-panel-elevated {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1), border-color 150ms cubic-bezier(0.22, 1, 0.36, 1), color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mono-text {

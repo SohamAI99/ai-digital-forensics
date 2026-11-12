@@ -25,9 +25,9 @@ export const ReportsPage: React.FC = () => {
   return (
     <div className="space-y-6 theme-transition">
       <div className="flex items-center space-x-2">
-        <FileText className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+        <FileText className="w-4 h-4 text-theme-muted" strokeWidth={1.5} />
         <h3 className="text-base font-semibold text-theme-heading">Generated Forensic Examination Reports</h3>
-        <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono border border-slate-200 dark:border-slate-700">
+        <span className="px-2 py-0.5 rounded text-xs bg-theme-subtle text-theme-muted font-mono border border-theme tabular-nums">
           {items.length} available
         </span>
       </div>
@@ -54,17 +54,17 @@ export const ReportsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-theme text-theme-main">
                 {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-100/60 dark:hover:bg-slate-850/40 transition">
-                    <td className="py-3 px-4 font-mono text-blue-600 dark:text-blue-400 font-semibold">{item.id}</td>
+                  <tr key={item.id} className="hover:bg-theme-subtle/50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-blue-600 dark:text-blue-400 font-medium">{item.id}</td>
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] border font-medium ${
-                          item.analysis_type === 'email'
-                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-                            : 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
-                        }`}
+                        className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[11px] border border-theme bg-theme-inset text-theme-main font-medium"
                       >
-                        {item.analysis_type === 'email' ? <Mail className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
+                        {item.analysis_type === 'email' ? (
+                          <Mail className="w-3 h-3 text-theme-muted" strokeWidth={1.5} />
+                        ) : (
+                          <ImageIcon className="w-3 h-3 text-theme-muted" strokeWidth={1.5} />
+                        )}
                         <span className="capitalize">{item.analysis_type}</span>
                       </span>
                     </td>
@@ -73,7 +73,7 @@ export const ReportsPage: React.FC = () => {
                     <td className="py-3 px-4">
                       <RiskBadge level={item.risk_level} />
                     </td>
-                    <td className="py-3 px-4 font-mono text-[11px] text-theme-muted">
+                    <td className="py-3 px-4 font-mono text-[11px] text-theme-muted tabular-nums">
                       {new Date(item.timestamp).toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
@@ -81,9 +81,9 @@ export const ReportsPage: React.FC = () => {
                         href={`/api/reports/${item.id}/pdf`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 text-[11px] font-semibold transition"
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 text-[11px] font-medium transition-colors"
                       >
-                        <Download className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5" strokeWidth={1.5} />
                         <span>Download PDF</span>
                       </a>
                     </td>

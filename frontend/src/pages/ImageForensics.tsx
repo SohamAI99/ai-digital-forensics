@@ -138,7 +138,7 @@ export const ImageForensics: React.FC = () => {
           <button
             onClick={handleAnalyze}
             disabled={loading || !selectedFile}
-            className="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs tracking-wide transition shadow-lg shadow-purple-600/20 disabled:opacity-50 flex items-center space-x-2 cursor-pointer"
+            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-colors disabled:opacity-50 flex items-center space-x-2 cursor-pointer"
           >
             {loading ? (
               <>
@@ -147,7 +147,7 @@ export const ImageForensics: React.FC = () => {
               </>
             ) : (
               <>
-                <Fingerprint className="w-4 h-4" />
+                <Fingerprint className="w-4 h-4" strokeWidth={1.5} />
                 <span>Execute Image Forensic Analysis</span>
               </>
             )}
@@ -163,24 +163,24 @@ export const ImageForensics: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-theme">
               <div>
                 <div className="flex items-center space-x-3">
-                  <h3 className="text-xl font-bold text-theme-heading">{result.prediction}</h3>
+                  <h3 className="text-xl font-semibold text-theme-heading">{result.prediction}</h3>
                   <RiskBadge level={result.risk_level} score={result.overall_risk_score} />
                 </div>
-                <p className="text-xs text-theme-muted font-mono mt-1">
+                <p className="text-xs text-theme-muted font-mono mt-1 tabular-nums">
                   Case: {result.analysis_id} &bull; File: {result.filename} &bull; {result.dimensions[0]}×{result.dimensions[1]}px
                 </p>
                 <p className="text-[11px] font-mono text-theme-muted mt-1 truncate max-w-xl">
                   SHA-256:{' '}
-                  <span className="text-purple-600 dark:text-purple-400 font-semibold">{result.sha256}</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-medium">{result.sha256}</span>
                 </p>
               </div>
               <a
                 href={`/api/reports/${result.analysis_id}/pdf`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 flex items-center space-x-2 transition cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-theme-subtle hover:bg-theme-inset text-theme-heading text-xs font-medium border border-theme flex items-center space-x-2 transition-colors cursor-pointer"
               >
-                <Download className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
                 <span>Export PDF Report</span>
               </a>
             </div>
@@ -190,11 +190,11 @@ export const ImageForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>Overall Risk Assessment</span>
-                  <span className="font-mono font-medium text-theme-heading">{result.overall_risk_score}/100</span>
+                  <span className="font-mono font-medium text-theme-heading tabular-nums">{result.overall_risk_score}/100</span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2.5 rounded-full transition-all duration-500 ${
+                    className={`h-2 rounded-full transition-[width] duration-300 ${
                       result.overall_risk_score >= 70 ? 'bg-rose-500' : result.overall_risk_score >= 30 ? 'bg-amber-500' : 'bg-emerald-500'
                     }`}
                     style={{ width: `${result.overall_risk_score}%` }}
@@ -204,13 +204,13 @@ export const ImageForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>Deepfake / Manipulated Score</span>
-                  <span className="font-mono text-rose-600 dark:text-rose-400 font-medium">
+                  <span className="font-mono text-rose-600 dark:text-rose-400 font-medium tabular-nums">
                     {(result.deepfake_probability * 100).toFixed(2)}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-2.5 bg-rose-500 rounded-full transition-all duration-500"
+                    className="h-2 bg-rose-500 rounded-full transition-[width] duration-300"
                     style={{ width: `${result.deepfake_probability * 100}%` }}
                   />
                 </div>
@@ -218,13 +218,13 @@ export const ImageForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>Pristine / Authentic Score</span>
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium tabular-nums">
                     {(result.pristine_probability * 100).toFixed(2)}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-2.5 bg-emerald-500 rounded-full transition-all duration-500"
+                    className="h-2 bg-emerald-500 rounded-full transition-[width] duration-300"
                     style={{ width: `${result.pristine_probability * 100}%` }}
                   />
                 </div>
@@ -268,9 +268,9 @@ export const ImageForensics: React.FC = () => {
               </div>
             )}
             {result.gradcam_url && (
-              <div className="rounded-xl bg-theme-card border border-purple-300 dark:border-purple-900/40 overflow-hidden shadow-theme-card">
-                <div className="px-3 py-2 border-b border-purple-200 dark:border-purple-900/40 text-xs text-purple-600 dark:text-purple-400 flex items-center space-x-1.5 bg-purple-500/5 font-medium">
-                  <Cpu className="w-3.5 h-3.5" />
+              <div className="rounded-xl bg-theme-card border border-theme overflow-hidden shadow-theme-card">
+                <div className="px-3 py-2 border-b border-theme text-xs text-theme-muted flex items-center space-x-1.5 bg-theme-inset/50 font-medium">
+                  <Cpu className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
                   <span>Grad-CAM Heatmap</span>
                 </div>
                 <div className="p-2 flex items-center justify-center bg-theme-inset">
@@ -294,16 +294,16 @@ export const ImageForensics: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center space-x-2 px-4 py-2.5 font-medium border-b-2 transition whitespace-nowrap cursor-pointer ${
+                  className={`flex items-center space-x-2 px-4 py-2.5 font-medium border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
                     isActive
-                      ? 'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-500/10'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-500/10'
                       : 'border-transparent text-theme-muted hover:text-theme-heading'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4" strokeWidth={1.5} />
                   <span>{tab.label}</span>
                   {'count' in tab && tab.count !== undefined && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-theme-subtle text-theme-muted font-mono tabular-nums">
                       {tab.count}
                     </span>
                   )}
@@ -318,11 +318,11 @@ export const ImageForensics: React.FC = () => {
               {result.evidence.map((ev, i) => (
                 <div key={i} className="p-4 rounded-xl bg-theme-card border border-theme shadow-theme-card">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-theme-inset text-theme-muted border border-theme">
                       {ev.category}
                     </span>
                     <span
-                      className={`text-xs font-semibold uppercase px-2 py-0.5 rounded ${
+                      className={`text-xs font-medium px-2 py-0.5 rounded tabular-nums ${
                         ev.severity === 'high'
                           ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                           : ev.severity === 'medium'
@@ -435,21 +435,21 @@ export const ImageForensics: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
                   <p className="text-theme-muted text-[11px]">High-Frequency Energy Ratio</p>
-                  <p className="text-base font-bold text-theme-heading mt-1">
+                  <p className="text-base font-semibold text-theme-heading mt-1 tabular-nums">
                     {(result.frequency.high_freq_ratio * 100).toFixed(1)}%
                   </p>
                   <p className="text-[10px] text-theme-muted mt-1">Outer 45% radial spectrum energy</p>
                 </div>
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
                   <p className="text-theme-muted text-[11px]">Spectral Centroid</p>
-                  <p className="text-base font-bold text-theme-heading mt-1 font-mono">
+                  <p className="text-base font-semibold text-theme-heading mt-1 font-mono tabular-nums">
                     {result.frequency.spectral_centroid}
                   </p>
                   <p className="text-[10px] text-theme-muted mt-1">Amplitude-weighted mean frequency</p>
                 </div>
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
                   <p className="text-theme-muted text-[11px]">Azimuthal Variation</p>
-                  <p className="text-base font-bold text-theme-heading mt-1 font-mono">
+                  <p className="text-base font-semibold text-theme-heading mt-1 font-mono tabular-nums">
                     {result.frequency.azimuthal_deviation}
                   </p>
                   <p className="text-[10px] text-theme-muted mt-1">Variance across 16 angular sectors</p>
@@ -467,7 +467,7 @@ export const ImageForensics: React.FC = () => {
           {activeTab === 'gradcam' && (
             <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card space-y-4">
               <h4 className="text-sm font-semibold text-theme-heading flex items-center space-x-2">
-                <Cpu className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                <Cpu className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
                 <span>Convolutional Feature Attribution (Grad-CAM)</span>
               </h4>
               <p className="text-xs text-theme-main leading-relaxed">
@@ -476,10 +476,10 @@ export const ImageForensics: React.FC = () => {
               </p>
               {result.gradcam_url ? (
                 <div className="flex justify-center p-4 bg-theme-inset rounded-lg border border-theme">
-                  <img src={result.gradcam_url} alt="Grad-CAM Overlay" className="max-h-96 rounded shadow-md" />
+                  <img src={result.gradcam_url} alt="Grad-CAM Overlay" className="max-h-96 rounded" />
                 </div>
               ) : (
-                <p className="text-xs text-theme-muted italic">Grad-CAM visualization unavailable for this sample.</p>
+                <p className="text-xs text-theme-muted">Grad-CAM visualization unavailable for this sample.</p>
               )}
               <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-700 dark:text-purple-300 flex items-start space-x-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5 text-purple-600 dark:text-purple-400" />

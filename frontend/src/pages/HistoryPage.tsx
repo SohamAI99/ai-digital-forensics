@@ -37,35 +37,35 @@ export const HistoryPage: React.FC = () => {
       {/* Controls Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center space-x-2">
-          <History className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+          <History className="w-4 h-4 text-theme-muted" strokeWidth={1.5} />
           <h3 className="text-base font-semibold text-theme-heading">Complete Analysis Audit Log</h3>
-          <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono border border-slate-200 dark:border-slate-700">
+          <span className="px-2 py-0.5 rounded text-xs bg-theme-subtle text-theme-muted font-mono border border-theme tabular-nums">
             {items.length} records
           </span>
         </div>
 
         <div className="flex items-center space-x-3">
           {/* Search */}
-          <div className="flex items-center bg-theme-card border border-theme rounded-lg px-3 py-1.5 text-xs shadow-sm">
-            <Search className="w-3.5 h-3.5 text-theme-muted mr-2" />
+          <div className="flex items-center bg-theme-card border border-theme rounded-lg px-3 py-1.5 text-xs">
+            <Search className="w-3.5 h-3.5 text-theme-muted mr-2" strokeWidth={1.5} />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search case ID, subject, classification..."
-              className="bg-transparent text-theme-heading outline-none w-60 placeholder:text-theme-muted"
+              placeholder="Search"
+              className="bg-transparent text-theme-heading outline-none w-56 placeholder:text-theme-muted"
             />
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center bg-theme-card p-1 rounded-lg border border-theme text-xs shadow-sm">
+          <div className="flex items-center bg-theme-card p-1 rounded-lg border border-theme text-xs">
             {(['all', 'email', 'image'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-md font-medium transition capitalize cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md font-medium transition-colors capitalize cursor-pointer ${
                   filter === f
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-blue-600 text-white'
                     : 'text-theme-muted hover:text-theme-heading'
                 }`}
               >
@@ -88,29 +88,29 @@ export const HistoryPage: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="text-theme-muted bg-theme-inset/70 border-b border-theme font-medium">
                 <tr>
-                  <th className="py-3 px-4">Case ID</th>
-                  <th className="py-3 px-4">Module</th>
-                  <th className="py-3 px-4">Target Subject / File</th>
-                  <th className="py-3 px-4">Classification</th>
-                  <th className="py-3 px-4">Risk Level</th>
-                  <th className="py-3 px-4">Score</th>
-                  <th className="py-3 px-4">Timestamp</th>
-                  <th className="py-3 px-4">Actions</th>
+                  <th className="py-3 px-4 font-medium">Case ID</th>
+                  <th className="py-3 px-4 font-medium">Module</th>
+                  <th className="py-3 px-4 font-medium">Target Subject / File</th>
+                  <th className="py-3 px-4 font-medium">Classification</th>
+                  <th className="py-3 px-4 font-medium">Risk Level</th>
+                  <th className="py-3 px-4 font-medium">Score</th>
+                  <th className="py-3 px-4 font-medium">Timestamp</th>
+                  <th className="py-3 px-4 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-theme text-theme-main">
                 {filtered.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-100/60 dark:hover:bg-slate-850/40 transition">
-                    <td className="py-3 px-4 font-mono text-blue-600 dark:text-blue-400 font-semibold">{item.id}</td>
+                  <tr key={item.id} className="hover:bg-theme-subtle/50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-blue-600 dark:text-blue-400 font-medium">{item.id}</td>
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] border font-medium ${
-                          item.analysis_type === 'email'
-                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-                            : 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
-                        }`}
+                        className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[11px] border border-theme bg-theme-inset text-theme-main font-medium"
                       >
-                        {item.analysis_type === 'email' ? <Mail className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
+                        {item.analysis_type === 'email' ? (
+                          <Mail className="w-3 h-3 text-theme-muted" strokeWidth={1.5} />
+                        ) : (
+                          <ImageIcon className="w-3 h-3 text-theme-muted" strokeWidth={1.5} />
+                        )}
                         <span className="capitalize">{item.analysis_type}</span>
                       </span>
                     </td>
@@ -119,25 +119,25 @@ export const HistoryPage: React.FC = () => {
                     <td className="py-3 px-4">
                       <RiskBadge level={item.risk_level} />
                     </td>
-                    <td className="py-3 px-4 font-mono font-medium">{item.overall_score}</td>
-                    <td className="py-3 px-4 text-theme-muted font-mono text-[11px]">
+                    <td className="py-3 px-4 font-mono font-medium tabular-nums">{item.overall_score}</td>
+                    <td className="py-3 px-4 text-theme-muted font-mono text-[11px] tabular-nums">
                       {new Date(item.timestamp).toLocaleString()}
                     </td>
                     <td className="py-3 px-4 flex items-center space-x-2">
                       <button
                         onClick={() => setSelectedItem(item)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-semibold cursor-pointer"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium cursor-pointer transition-colors"
                       >
                         Inspect
                       </button>
-                      <span className="text-slate-300 dark:text-slate-700">|</span>
+                      <span className="text-theme-dim">|</span>
                       <a
                         href={`/api/reports/${item.id}/pdf`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-theme-muted hover:text-theme-heading font-semibold"
+                        className="text-theme-muted hover:text-theme-heading font-medium transition-colors"
                       >
-                        PDF ↗
+                        PDF &rarr;
                       </a>
                     </td>
                   </tr>
@@ -147,8 +147,8 @@ export const HistoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-12 bg-theme-card">
-            <Clock className="w-8 h-8 text-theme-dim mx-auto mb-3" />
-            <p className="text-sm text-theme-heading font-medium">No forensic investigations on record.</p>
+            <Clock className="w-8 h-8 text-theme-dim mx-auto mb-3" strokeWidth={1.5} />
+            <p className="text-sm text-theme-heading font-medium">No forensic investigations on record</p>
             <p className="text-xs text-theme-muted mt-1">Completed email and image analyses will appear here.</p>
           </div>
         )}
@@ -156,30 +156,28 @@ export const HistoryPage: React.FC = () => {
 
       {/* Case Inspection Modal */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-theme-card border border-theme rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/75 p-4">
+          <div className="bg-theme-card border border-theme rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 relative">
             <div className="flex items-center justify-between pb-4 border-b border-theme">
               <div className="flex items-center space-x-3">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    selectedItem.analysis_type === 'email'
-                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                      : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                  }`}
-                >
-                  {selectedItem.analysis_type === 'email' ? <Mail className="w-4 h-4" /> : <ImageIcon className="w-4 h-4" />}
+                <div className="w-8 h-8 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-theme-muted">
+                  {selectedItem.analysis_type === 'email' ? (
+                    <Mail className="w-4 h-4" strokeWidth={1.5} />
+                  ) : (
+                    <ImageIcon className="w-4 h-4" strokeWidth={1.5} />
+                  )}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-theme-heading font-mono">{selectedItem.id}</h3>
+                  <h3 className="text-sm font-semibold text-theme-heading font-mono">{selectedItem.id}</h3>
                   <p className="text-[11px] text-theme-muted capitalize">{selectedItem.analysis_type} Forensic Examination</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="p-1.5 rounded-lg text-theme-muted hover:text-theme-heading hover:bg-theme-inset transition cursor-pointer"
+                className="p-1.5 rounded-lg text-theme-muted hover:text-theme-heading hover:bg-theme-inset transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" strokeWidth={1.5} />
               </button>
             </div>
 
@@ -193,14 +191,14 @@ export const HistoryPage: React.FC = () => {
               </div>
 
               <div>
-                <p className="text-theme-muted text-[11px] font-semibold uppercase tracking-wider mb-1">Target Subject / File</p>
+                <p className="text-theme-muted text-xs font-medium mb-1">Target subject / file</p>
                 <p className="p-2.5 bg-theme-inset rounded border border-theme font-mono text-theme-heading break-all">
                   {selectedItem.identifier}
                 </p>
               </div>
 
               <div>
-                <p className="text-theme-muted text-[11px] font-semibold uppercase tracking-wider mb-1">Forensic Summary</p>
+                <p className="text-theme-muted text-xs font-medium mb-1">Forensic summary</p>
                 <p className="p-2.5 bg-theme-inset rounded border border-theme text-theme-main leading-relaxed">
                   {selectedItem.summary || 'No summary available.'}
                 </p>
@@ -208,7 +206,7 @@ export const HistoryPage: React.FC = () => {
 
               {selectedItem.details && Object.keys(selectedItem.details).length > 0 && (
                 <div>
-                  <p className="text-theme-muted text-[11px] font-semibold uppercase tracking-wider mb-1">Telemetry &amp; Findings Breakdown</p>
+                  <p className="text-theme-muted text-xs font-medium mb-1">Telemetry &amp; findings breakdown</p>
                   <pre className="p-3 bg-theme-inset rounded border border-theme text-theme-main font-mono text-[11px] overflow-x-auto max-h-48 leading-tight">
                     {JSON.stringify(selectedItem.details, null, 2)}
                   </pre>
@@ -216,16 +214,16 @@ export const HistoryPage: React.FC = () => {
               )}
 
               <div className="pt-3 border-t border-theme flex items-center justify-between">
-                <span className="text-[11px] text-theme-muted font-mono">
+                <span className="text-[11px] text-theme-muted font-mono tabular-nums">
                   Recorded: {new Date(selectedItem.timestamp).toLocaleString()}
                 </span>
                 <a
                   href={`/api/reports/${selectedItem.id}/pdf`}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center space-x-1.5 transition shadow"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium flex items-center space-x-1.5 transition-colors"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-3.5 h-3.5" strokeWidth={1.5} />
                   <span>Download Court-Grade PDF</span>
                 </a>
               </div>

@@ -246,7 +246,7 @@ export const EmailForensics: React.FC = () => {
           <button
             onClick={handleAnalyze}
             disabled={loading}
-            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs tracking-wide transition shadow-lg shadow-blue-600/20 disabled:opacity-50 flex items-center space-x-2 cursor-pointer"
+            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-colors disabled:opacity-50 flex items-center space-x-2 cursor-pointer"
           >
             {loading ? (
               <>
@@ -255,7 +255,7 @@ export const EmailForensics: React.FC = () => {
               </>
             ) : (
               <>
-                <Shield className="w-4 h-4" />
+                <Shield className="w-4 h-4" strokeWidth={1.5} />
                 <span>Execute Email Threat Analysis</span>
               </>
             )}
@@ -271,7 +271,7 @@ export const EmailForensics: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-theme">
               <div>
                 <div className="flex items-center space-x-3">
-                  <h3 className="text-xl font-bold text-theme-heading tracking-wide">
+                  <h3 className="text-xl font-semibold text-theme-heading">
                     {result.prediction}
                   </h3>
                   <RiskBadge level={result.risk_level} score={result.overall_risk_score} />
@@ -299,11 +299,11 @@ export const EmailForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>Calculated Risk Assessment</span>
-                  <span className="font-mono text-theme-heading font-semibold">{result.overall_risk_score}/100</span>
+                  <span className="font-mono text-theme-heading font-semibold tabular-nums">{result.overall_risk_score}/100</span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2.5 rounded-full transition-all duration-500 ${
+                    className={`h-2 rounded-full transition-[width] duration-300 ${
                       result.overall_risk_score >= 70
                         ? 'bg-rose-500'
                         : result.overall_risk_score >= 30
@@ -319,13 +319,13 @@ export const EmailForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>ML Phishing Probability</span>
-                  <span className="font-mono text-rose-600 dark:text-rose-400 font-semibold">
+                  <span className="font-mono text-rose-600 dark:text-rose-400 font-semibold tabular-nums">
                     {(result.phishing_probability * 100).toFixed(2)}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-2.5 bg-rose-500 rounded-full transition-all duration-500"
+                    className="h-2 bg-rose-500 rounded-full transition-[width] duration-300"
                     style={{ width: `${result.phishing_probability * 100}%` }}
                   />
                 </div>
@@ -335,13 +335,13 @@ export const EmailForensics: React.FC = () => {
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
                   <span>ML Safe Probability</span>
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">
                     {(result.safe_probability * 100).toFixed(2)}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-theme-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-2.5 bg-emerald-500 rounded-full transition-all duration-500"
+                    className="h-2 bg-emerald-500 rounded-full transition-[width] duration-300"
                     style={{ width: `${result.safe_probability * 100}%` }}
                   />
                 </div>
@@ -410,11 +410,11 @@ export const EmailForensics: React.FC = () => {
                 {result.evidence.map((ev, i) => (
                   <div key={i} className="p-4 rounded-xl bg-theme-card border border-theme shadow-theme-card">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-theme-inset text-theme-muted border border-theme">
                         {ev.category}
                       </span>
                       <span
-                        className={`text-xs font-semibold uppercase px-2 py-0.5 rounded ${
+                        className={`text-xs font-medium px-2 py-0.5 rounded tabular-nums ${
                           ev.severity === 'high'
                             ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                             : ev.severity === 'medium'
@@ -520,7 +520,7 @@ export const EmailForensics: React.FC = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-theme-muted italic">
+                <p className="text-xs text-theme-muted">
                   No statistical LIME features were extracted for this input length.
                 </p>
               )}

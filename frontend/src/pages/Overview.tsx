@@ -57,15 +57,13 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
         <div className="p-5 rounded-xl bg-theme-card border border-theme flex items-center justify-between shadow-theme-card theme-transition">
           <div>
             <p className="text-xs font-medium text-theme-muted">Total Email Analyses</p>
-            <h3 className="text-2xl font-bold text-theme-heading mt-1">
+            <h3 className="text-2xl font-semibold text-theme-heading mt-1 tabular-nums">
               {summary ? summary.email_total : 0}
             </h3>
-            <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1 flex items-center space-x-1">
-              <span>TF-IDF + Logistic Reg</span>
-            </p>
+            <p className="text-[11px] text-theme-muted mt-1">TF-IDF + Logistic Reg</p>
           </div>
-          <div className="w-12 h-12 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Mail className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-theme-muted">
+            <Mail className="w-5 h-5" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -73,13 +71,13 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
         <div className="p-5 rounded-xl bg-theme-card border border-theme flex items-center justify-between shadow-theme-card theme-transition">
           <div>
             <p className="text-xs font-medium text-theme-muted">High-Risk Phishing</p>
-            <h3 className="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">
+            <h3 className="text-2xl font-semibold text-rose-600 dark:text-rose-400 mt-1 tabular-nums">
               {summary ? summary.high_risk_emails : 0}
             </h3>
             <p className="text-[11px] text-theme-muted mt-1">Confirmed threat patterns</p>
           </div>
-          <div className="w-12 h-12 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
-            <AlertTriangle className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-rose-600 dark:text-rose-400">
+            <AlertTriangle className="w-5 h-5" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -87,13 +85,13 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
         <div className="p-5 rounded-xl bg-theme-card border border-theme flex items-center justify-between shadow-theme-card theme-transition">
           <div>
             <p className="text-xs font-medium text-theme-muted">Total Image Analyses</p>
-            <h3 className="text-2xl font-bold text-theme-heading mt-1">
+            <h3 className="text-2xl font-semibold text-theme-heading mt-1 tabular-nums">
               {summary ? summary.image_total : 0}
             </h3>
-            <p className="text-[11px] text-purple-600 dark:text-purple-400 mt-1">EXIF + 2D FFT/DCT</p>
+            <p className="text-[11px] text-theme-muted mt-1">EXIF + 2D FFT/DCT</p>
           </div>
-          <div className="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <ImageIcon className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-theme-muted">
+            <ImageIcon className="w-5 h-5" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -101,13 +99,13 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
         <div className="p-5 rounded-xl bg-theme-card border border-theme flex items-center justify-between shadow-theme-card theme-transition">
           <div>
             <p className="text-xs font-medium text-theme-muted">Potential Deepfakes</p>
-            <h3 className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
+            <h3 className="text-2xl font-semibold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
               {summary ? summary.potential_deepfakes : 0}
             </h3>
-            <p className="text-[11px] text-theme-muted mt-1">Synthetic & edited images</p>
+            <p className="text-[11px] text-theme-muted mt-1">Synthetic &amp; edited images</p>
           </div>
-          <div className="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
-            <ShieldAlert className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <ShieldAlert className="w-5 h-5" strokeWidth={1.5} />
           </div>
         </div>
       </div>
@@ -115,18 +113,18 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
       {/* Module Launch Cards (Independent Modules) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Email Module Card */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-white to-blue-50/60 dark:from-[#0f172a] dark:to-[#131d33] border border-blue-200 dark:border-blue-900/40 relative overflow-hidden group shadow-theme-card theme-transition">
+        <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card theme-transition">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <Mail className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <Mail className="w-5 h-5" strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="text-base font-semibold text-theme-heading">Email Threat Forensics</h4>
-                <p className="text-xs text-theme-muted">Module 1 &bull; Text & Infrastructure</p>
+                <p className="text-xs text-theme-muted">Module 1 &bull; Text &amp; Infrastructure</p>
               </div>
             </div>
-            <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20 font-mono font-medium">
+            <span className="text-xs text-theme-muted font-mono">
               TF-IDF Pipeline
             </span>
           </div>
@@ -139,32 +137,32 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
 
           <div className="flex items-center justify-between pt-4 border-t border-theme">
             <div className="flex items-center space-x-2 text-xs text-theme-muted">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
               <span>Joblib Model: 50,000 N-Grams</span>
             </div>
             <button
               onClick={() => onNavigate('email')}
-              className="flex items-center space-x-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 group-hover:translate-x-1 transition cursor-pointer"
+              className="flex items-center space-x-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
             >
               <span>Launch Module</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
             </button>
           </div>
         </div>
 
         {/* Image Module Card */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-white to-purple-50/60 dark:from-[#0f172a] dark:to-[#1d1633] border border-purple-200 dark:border-purple-900/40 relative overflow-hidden group shadow-theme-card theme-transition">
+        <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card theme-transition">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-600/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                <ImageIcon className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-theme-subtle border border-theme flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <ImageIcon className="w-5 h-5" strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="text-base font-semibold text-theme-heading">Deepfake Image Forensics</h4>
-                <p className="text-xs text-theme-muted">Module 2 &bull; Vision & Frequency</p>
+                <p className="text-xs text-theme-muted">Module 2 &bull; Vision &amp; Frequency</p>
               </div>
             </div>
-            <span className="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2.5 py-1 rounded-full border border-purple-500/20 font-mono font-medium">
+            <span className="text-xs text-theme-muted font-mono">
               PyTorch Core
             </span>
           </div>
@@ -177,15 +175,15 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
 
           <div className="flex items-center justify-between pt-4 border-t border-theme">
             <div className="flex items-center space-x-2 text-xs text-theme-muted">
-              <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
               <span>Face Detector + Grad-CAM</span>
             </div>
             <button
               onClick={() => onNavigate('image')}
-              className="flex items-center space-x-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 group-hover:translate-x-1 transition cursor-pointer"
+              className="flex items-center space-x-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
             >
               <span>Launch Module</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
             </button>
           </div>
         </div>
@@ -196,50 +194,50 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
         <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card theme-transition">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <Cpu className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Cpu className="w-4 h-4 text-theme-muted" strokeWidth={1.5} />
               <h4 className="text-sm font-semibold text-theme-heading">
-                Saved Email Model Evaluation Benchmarks (Ground Truth)
+                Saved Email Model Evaluation Benchmarks
               </h4>
             </div>
             <span className="text-xs text-theme-muted font-mono">
-              Dataset: {evalMetrics.dataset.source_file} ({evalMetrics.dataset.deduplicated_records} deduplicated samples)
+              Dataset: {evalMetrics.dataset.source_file} ({evalMetrics.dataset.deduplicated_records} samples)
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
             <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-              <p className="text-[11px] text-theme-muted">Accuracy</p>
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+              <p className="text-xs text-theme-muted">Accuracy</p>
+              <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 tabular-nums">
                 {(evalMetrics.metrics.accuracy * 100).toFixed(2)}%
               </p>
             </div>
             <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-              <p className="text-[11px] text-theme-muted">Precision</p>
-              <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+              <p className="text-xs text-theme-muted">Precision</p>
+              <p className="text-lg font-semibold text-theme-heading mt-0.5 tabular-nums">
                 {(evalMetrics.metrics.precision * 100).toFixed(2)}%
               </p>
             </div>
             <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-              <p className="text-[11px] text-theme-muted">Recall</p>
-              <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
+              <p className="text-xs text-theme-muted">Recall</p>
+              <p className="text-lg font-semibold text-theme-heading mt-0.5 tabular-nums">
                 {(evalMetrics.metrics.recall * 100).toFixed(2)}%
               </p>
             </div>
             <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-              <p className="text-[11px] text-theme-muted">F1-Score</p>
-              <p className="text-lg font-bold text-violet-600 dark:text-violet-400 mt-0.5">
+              <p className="text-xs text-theme-muted">F1-Score</p>
+              <p className="text-lg font-semibold text-theme-heading mt-0.5 tabular-nums">
                 {(evalMetrics.metrics.f1_score * 100).toFixed(2)}%
               </p>
             </div>
           </div>
 
-          <div className="p-3 bg-theme-inset rounded-lg border border-theme text-xs text-theme-muted flex flex-wrap justify-between items-center gap-2">
+          <div className="p-3 bg-theme-inset rounded-lg border border-theme text-xs text-theme-muted flex flex-wrap justify-between items-center gap-2 tabular-nums">
             <span>
-              <b className="text-theme-heading">Test Partition:</b> {evalMetrics.dataset.test_samples} unseen emails &bull; 
-              <b className="text-theme-heading"> True Positives:</b> {evalMetrics.metrics.confusion_matrix.true_positive_phishing} &bull; 
-              <b className="text-theme-heading"> True Negatives:</b> {evalMetrics.metrics.confusion_matrix.true_negative_safe} &bull; 
-              <b className="text-theme-heading"> False Positives:</b> {evalMetrics.metrics.confusion_matrix.false_positive_phishing} &bull; 
-              <b className="text-theme-heading"> False Negatives:</b> {evalMetrics.metrics.confusion_matrix.false_negative_safe}
+              <span className="font-medium text-theme-heading">Test Partition:</span> {evalMetrics.dataset.test_samples} unseen emails &bull;{' '}
+              <span className="font-medium text-theme-heading">TP:</span> {evalMetrics.metrics.confusion_matrix.true_positive_phishing} &bull;{' '}
+              <span className="font-medium text-theme-heading">TN:</span> {evalMetrics.metrics.confusion_matrix.true_negative_safe} &bull;{' '}
+              <span className="font-medium text-theme-heading">FP:</span> {evalMetrics.metrics.confusion_matrix.false_positive_phishing} &bull;{' '}
+              <span className="font-medium text-theme-heading">FN:</span> {evalMetrics.metrics.confusion_matrix.false_negative_safe}
             </span>
             <span className="text-[11px] text-theme-muted font-mono">
               Evaluated via stratified 80/20 split
@@ -252,12 +250,12 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
       <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card theme-transition">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-sm font-semibold text-theme-heading flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-theme-muted" />
+            <Clock className="w-4 h-4 text-theme-muted" strokeWidth={1.5} />
             <span>Recent Forensic Investigations</span>
           </h4>
           <button
             onClick={() => onNavigate('history')}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer"
+            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer transition-colors"
           >
             View Complete History &rarr;
           </button>
@@ -268,20 +266,20 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
             <table className="w-full text-left text-xs">
               <thead className="text-theme-muted bg-theme-inset border-b border-theme">
                 <tr>
-                  <th className="py-2.5 px-3">Case ID</th>
-                  <th className="py-2.5 px-3">Module</th>
-                  <th className="py-2.5 px-3">Target Subject / File</th>
-                  <th className="py-2.5 px-3">Classification</th>
-                  <th className="py-2.5 px-3">Risk Level</th>
-                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-2.5 px-3 font-medium">Case ID</th>
+                  <th className="py-2.5 px-3 font-medium">Module</th>
+                  <th className="py-2.5 px-3 font-medium">Target Subject / File</th>
+                  <th className="py-2.5 px-3 font-medium">Classification</th>
+                  <th className="py-2.5 px-3 font-medium">Risk Level</th>
+                  <th className="py-2.5 px-3 font-medium">Timestamp</th>
                 </tr>
               </thead>
               <tbody className="divide-y border-theme text-theme-main">
                 {summary.recent_activity.map((item) => (
-                  <tr key={item.id} className="hover:bg-theme-subtle/50 transition">
-                    <td className="py-2.5 px-3 font-mono text-blue-600 dark:text-blue-400 font-semibold">{item.id}</td>
+                  <tr key={item.id} className="hover:bg-theme-subtle/50 transition-colors">
+                    <td className="py-2.5 px-3 font-mono text-blue-600 dark:text-blue-400 font-medium">{item.id}</td>
                     <td className="py-2.5 px-3">
-                      <span className="capitalize px-2 py-0.5 rounded text-[10px] bg-theme-inset border border-theme">
+                      <span className="capitalize px-2 py-0.5 rounded text-[11px] bg-theme-inset border border-theme">
                         {item.analysis_type}
                       </span>
                     </td>
@@ -292,7 +290,7 @@ export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
                     <td className="py-2.5 px-3">
                       <RiskBadge level={item.risk_level} score={item.overall_score} />
                     </td>
-                    <td className="py-2.5 px-3 text-theme-muted font-mono text-[11px]">
+                    <td className="py-2.5 px-3 text-theme-muted font-mono text-[11px] tabular-nums">
                       {new Date(item.timestamp).toLocaleString()}
                     </td>
                   </tr>
