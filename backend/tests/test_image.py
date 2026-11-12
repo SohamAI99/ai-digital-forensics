@@ -66,3 +66,82 @@ def test_vision_detector_gradcam():
     assert "deepfake_probability" in res
     assert "pristine_probability" in res
     assert res["gradcam_url"] is not None
+
+def test_exif_service_synthetic():
+    data = create_synthetic_image_bytes(120, 120, add_face=False)
+    _, pil_img, _ = image_preprocessor_service.validate_and_load(data, "test.jpg")
+    exif = exif_service.extract_exif(pil_img, file_bytes=data, filename="test.jpg")
+    assert "file_properties" in exif
+    assert exif["file_properties"]["dimensions"] == "120 x 120 px"
+    assert "metadata_verdict" in exif
+    assert "raw_tags" in exif
+
+def test_exif_ai_prompt_detection():
+    from PIL import PngImagePlugin
+    img = Image.new("RGB", (64, 64))
+    png_info = PngImagePlugin.PngInfo()
+    png_info.add_text("parameters", "photorealistic portrait, Steps: 25, Sampler: Euler a, CFG scale: 7, Seed: 42")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", pnginfo=png_info)
+    png_bytes = buf.getvalue()
+    buf.seek(0)
+    pil_img = Image.open(buf)
+    res = exif_service.extract_exif(pil_img, file_bytes=png_bytes, filename="ai_gen.png")
+    assert res["ai_generation_detected"] is True
+    assert any("Stable Diffusion" in sig for sig in res["ai_tool_signatures"])
+    assert res["metadata_risk_score"] >= 90.0
+    assert any("Generative AI metadata" in flag for flag in res["anomaly_flags"])
+
+def test_exif_software_editing_detection():
+    from PIL import PngImagePlugin
+    img = Image.new("RGB", (64, 64))
+    png_info = PngImagePlugin.PngInfo()
+    png_info.add_text("Software", "Adobe Photoshop 2024 (Windows)")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", pnginfo=png_info)
+    png_bytes = buf.getvalue()
+    buf.seek(0)
+    pil_img = Image.open(buf)
+    res = exif_service.extract_exif(pil_img, file_bytes=png_bytes, filename="edited.png")
+    assert res["editing_software_detected"] is True
+    assert "Photoshop" in res["software"]
+    assert any("edited with graphics software" in flag for flag in res["anomaly_flags"])
+
+def test_exif_creation_and_modification_dates():
+    from backend.app.services.report_service import report_service
+    # 1. Test client_modified fallback
+    data = create_synthetic_image_bytes(64, 64, add_face=False)
+    _, pil_img, _ = image_preprocessor_service.validate_and_load(data, "test_dates.jpg")
+    client_time = "2024-11-13T01:30:00.000Z"
+    res = exif_service.extract_exif(pil_img, file_bytes=data, filename="test_dates.jpg", client_modified=client_time)
+    assert "creation_date" in res
+    assert "modification_date" in res
+    assert "2024-11-13 01:30:00 UTC" in res["creation_date"]
+    assert "2024-11-13 01:30:00 UTC" in res["modification_date"]
+    assert res["file_properties"]["creation_date"] == res["creation_date"]
+    assert res["camera_details"]["creation_date"] == res["creation_date"]
+    assert "OS File System Timestamp Preserved" in res["file_properties"]["temporal_status"]
+
+    # 2. Test PDF report includes the dates without error
+    report_dict = {
+        "analysis_id": "TEST-DATE-01",
+        "filename": "test_dates.jpg",
+        "sha256": "abcdef1234567890",
+        "prediction": "Authentic",
+        "deepfake_probability": 0.05,
+        "pristine_probability": 0.95,
+        "risk_level": "Low Risk",
+        "overall_risk_score": 5.0,
+        "dimensions": [64, 64],
+        "exif": res,
+        "frequency": {
+            "high_freq_ratio": 0.1,
+            "spectral_centroid": 12.0,
+            "azimuthal_deviation": 1.5,
+            "analysis_summary": "Clean spectrum"
+        },
+        "evidence": []
+    }
+    pdf_path = report_service.generate_image_pdf("TEST-DATE-01", report_dict)
+    assert pdf_path.endswith(".pdf")
+

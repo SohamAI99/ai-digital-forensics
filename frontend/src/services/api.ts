@@ -41,6 +41,9 @@ export async function analyzeEmail(text?: string, file?: File): Promise<EmailAna
 export async function analyzeImage(file: File): Promise<ImageAnalyzeResponse> {
   const formData = new FormData();
   formData.append('file', file);
+  if (file.lastModified) {
+    formData.append('file_last_modified', new Date(file.lastModified).toISOString());
+  }
 
   const res = await fetch(`${API_BASE}/image/analyze`, {
     method: 'POST',

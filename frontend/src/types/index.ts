@@ -84,10 +84,52 @@ export interface EmailAnalyzeResponse {
   limitations: string[];
 }
 
+export interface CameraDetails {
+  make?: string | null;
+  model?: string | null;
+  lens_model?: string | null;
+  iso?: number | string | null;
+  exposure_time?: string | null;
+  f_number?: string | null;
+  focal_length?: string | null;
+  flash?: string | null;
+  white_balance?: string | null;
+  metering_mode?: string | null;
+  software?: string | null;
+  datetime_original?: string | null;
+  creation_date?: string | null;
+  modification_date?: string | null;
+}
+
+export interface FileProperties {
+  file_format?: string | null;
+  mime_type?: string | null;
+  dimensions?: string | null;
+  megapixels?: string | null;
+  aspect_ratio?: string | null;
+  color_mode?: string | null;
+  channels?: number | null;
+  bit_depth?: string | null;
+  file_size_formatted?: string | null;
+  sha256?: string | null;
+  dpi?: string | null;
+  compression?: string | null;
+  chroma_subsampling?: string | null;
+  compression_quality?: string | null;
+  encoding_process?: string | null;
+  creation_date?: string | null;
+  modification_date?: string | null;
+  temporal_status?: string | null;
+}
+
 export interface ExifMetadata {
   make?: string | null;
   model?: string | null;
   datetime_original?: string | null;
+  creation_date?: string | null;
+  modification_date?: string | null;
+  temporal_status?: string | null;
+  datetime_modified?: string | null;
   software?: string | null;
   image_width?: number | null;
   image_height?: number | null;
@@ -95,6 +137,14 @@ export interface ExifMetadata {
   anomaly_flags: string[];
   raw_tags: Record<string, any>;
   gps_info?: Record<string, any> | null;
+  camera_details?: CameraDetails;
+  file_properties?: FileProperties;
+  ai_generation_detected?: boolean;
+  ai_tool_signatures?: string[];
+  ai_prompt_metadata?: string | null;
+  editing_software_detected?: boolean;
+  metadata_verdict?: string;
+  metadata_risk_score?: number;
 }
 
 export interface FrequencyMetrics {

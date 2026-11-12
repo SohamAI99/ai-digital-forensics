@@ -2,7 +2,8 @@ import uuid
 import cv2
 import hashlib
 from datetime import datetime, timezone
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from backend.app.schemas import ImageAnalyzeResponse, ExifMetadata, FrequencyMetrics, EvidenceItem
 from backend.app.services.image_preprocessor import image_preprocessor_service
 from backend.app.services.exif_service import exif_service
@@ -15,7 +16,10 @@ from backend.app.config import ARTIFACTS_DIR
 router = APIRouter(prefix="/api/image", tags=["Image Forensics"])
 
 @router.post("/analyze", response_model=ImageAnalyzeResponse)
-async def analyze_image(file: UploadFile = File(...)):
+async def analyze_image(
+    file: UploadFile = File(...),
+    file_last_modified: Optional[str] = Form(None)
+):
     if not file:
         raise HTTPException(status_code=400, detail="No image file uploaded.")
 
@@ -41,7 +45,12 @@ async def analyze_image(file: UploadFile = File(...)):
     orig_url = f"/artifacts/{orig_filename}"
 
     # 2. EXIF Metadata Extraction
-    exif_res = exif_service.extract_exif(pil_img)
+    exif_res = exif_service.extract_exif(
+        pil_img,
+        file_bytes=contents,
+        filename=filename,
+        client_modified=file_last_modified
+    )
 
     # 3. Face Detection & Cropping (with center-crop fallback)
     face_detected, face_crop_url, face_crop_bgr = image_preprocessor_service.detect_and_crop_face(img_bgr, analysis_id)
@@ -103,16 +112,34 @@ async def analyze_image(file: UploadFile = File(...)):
             score_impact=10.0
         ))
 
-    # EXIF Evidence
+    # EXIF & Metadata Evidence
     exif_score = 0.0
-    if exif_res.get("software"):
+    if exif_res.get("ai_generation_detected"):
+        exif_score += 25.0
+        sigs = ", ".join(exif_res.get("ai_tool_signatures", [])) or "Generative model synthesis parameters"
+        evidence.append(EvidenceItem(
+            category="exif",
+            title="Generative AI Metadata Signatures Detected",
+            description=f"Direct synthesis traces identified in metadata: {sigs}.",
+            severity="high",
+            score_impact=25.0
+        ))
+    elif exif_res.get("editing_software_detected") or exif_res.get("software"):
         exif_score += 15.0
         evidence.append(EvidenceItem(
             category="exif",
-            title="Image Editing Software Traces in Header",
-            description=f"Software metadata tag: {exif_res['software']}",
-            severity="high",
+            title="Image Editing Software Traces in Metadata",
+            description=f"Software metadata tag: {exif_res.get('software') or 'Graphics editing tool signature detected'}",
+            severity="medium",
             score_impact=15.0
+        ))
+    elif exif_res.get("has_exif") and (exif_res.get("make") or exif_res.get("model")):
+        evidence.append(EvidenceItem(
+            category="exif",
+            title="Authentic Camera Sensor Metadata Present",
+            description=f"Hardware capture profile found ({exif_res.get('make', '')} {exif_res.get('model', '')}). Consistent with optical sensor capture.",
+            severity="low",
+            score_impact=0.0
         ))
     elif not exif_res.get("has_exif"):
         evidence.append(EvidenceItem(
@@ -192,6 +219,9 @@ async def analyze_image(file: UploadFile = File(...)):
             "sha256": sha256_hash,
             "file_size_bytes": len(contents),
             "exif_has_data": exif_res.get("has_exif", False),
+            "metadata_verdict": exif_res.get("metadata_verdict"),
+            "ai_generation_detected": exif_res.get("ai_generation_detected", False),
+            "camera_details": exif_res.get("camera_details"),
             "high_freq_ratio": freq_res.get("high_freq_ratio"),
             "evidence_list": [ev.model_dump() for ev in evidence]
         },

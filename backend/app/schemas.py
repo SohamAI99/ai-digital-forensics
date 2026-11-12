@@ -70,6 +70,10 @@ class ExifMetadata(BaseModel):
     make: Optional[str] = None
     model: Optional[str] = None
     datetime_original: Optional[str] = None
+    creation_date: Optional[str] = None
+    modification_date: Optional[str] = None
+    temporal_status: Optional[str] = None
+    datetime_modified: Optional[str] = None
     software: Optional[str] = None
     image_width: Optional[int] = None
     image_height: Optional[int] = None
@@ -77,6 +81,14 @@ class ExifMetadata(BaseModel):
     anomaly_flags: List[str] = []
     raw_tags: Dict[str, Any] = {}
     gps_info: Optional[Dict[str, Any]] = None
+    camera_details: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    file_properties: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    ai_generation_detected: bool = False
+    ai_tool_signatures: List[str] = Field(default_factory=list)
+    ai_prompt_metadata: Optional[str] = None
+    editing_software_detected: bool = False
+    metadata_verdict: str = "Metadata Stripped / Inconclusive"
+    metadata_risk_score: float = 0.0
 
 class FrequencyMetrics(BaseModel):
     fft_spectrum_url: Optional[str] = None
