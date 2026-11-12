@@ -161,6 +161,7 @@ export interface ImageAnalyzeResponse {
   timestamp: string;
   filename: string;
   sha256: string;
+  md5?: string | null;
   file_size_bytes: number;
   dimensions: [number, number];
   prediction: string;
@@ -174,6 +175,7 @@ export interface ImageAnalyzeResponse {
   exif: ExifMetadata;
   frequency: FrequencyMetrics;
   gradcam_url?: string | null;
+  custodian_name?: string | null;
   evidence: EvidenceItem[];
   checks_performed: string[];
   checks_unavailable: string[];

@@ -18,7 +18,8 @@ router = APIRouter(prefix="/api/image", tags=["Image Forensics"])
 @router.post("/analyze", response_model=ImageAnalyzeResponse)
 async def analyze_image(
     file: UploadFile = File(...),
-    file_last_modified: Optional[str] = Form(None)
+    file_last_modified: Optional[str] = Form(None),
+    custodian_name: Optional[str] = Form(None)
 ):
     if not file:
         raise HTTPException(status_code=400, detail="No image file uploaded.")
@@ -27,6 +28,7 @@ async def analyze_image(
     contents = await file.read()
     analysis_id = f"IMG-{uuid.uuid4().hex[:8].upper()}"
     timestamp = datetime.now(timezone.utc).isoformat()
+    effective_custodian = (custodian_name or "").strip() or "Soyam Maji (Soyam08)"
 
     # 1. Validate and load image + compute cryptographic SHA-256
     try:
@@ -37,6 +39,7 @@ async def analyze_image(
         raise HTTPException(status_code=500, detail=f"Image processing error: {e}")
 
     sha256_hash = metadata.get("sha256") or hashlib.sha256(contents).hexdigest()
+    md5_hash = hashlib.md5(contents).hexdigest()
 
     # Save original image to artifacts
     orig_filename = f"orig_{analysis_id}.jpg"
@@ -179,20 +182,31 @@ async def analyze_image(
         "Heavily compressed social media images may suppress high-frequency generative traces."
     ]
 
-    # 7. Generate PDF Report
+    # 7. Generate Court-Admissible Forensic PDF Report
     report_dict = {
         "analysis_id": analysis_id,
         "filename": filename,
         "sha256": sha256_hash,
+        "md5": md5_hash,
+        "file_size_bytes": len(contents),
+        "timestamp": timestamp,
+        "custodian_name": effective_custodian,
         "prediction": vision_res["prediction"],
         "deepfake_probability": vision_res["deepfake_probability"],
         "pristine_probability": vision_res["pristine_probability"],
         "risk_level": risk_level,
         "overall_risk_score": total_risk,
         "dimensions": [metadata["width"], metadata["height"]],
+        "face_detected": face_detected,
+        "face_crop_url": face_crop_url,
+        "original_image_url": orig_url,
+        "gradcam_url": vision_res.get("gradcam_url"),
         "exif": exif_res,
         "frequency": freq_res,
-        "evidence": [ev.model_dump() for ev in evidence]
+        "evidence": [ev.model_dump() for ev in evidence],
+        "checks_performed": checks_performed,
+        "checks_unavailable": checks_unavailable,
+        "limitations": limitations
     }
     
     report_pdf_path = None
@@ -217,6 +231,8 @@ async def analyze_image(
             "face_detected": face_detected,
             "dimensions": [metadata["width"], metadata["height"]],
             "sha256": sha256_hash,
+            "md5": md5_hash,
+            "custodian_name": effective_custodian,
             "file_size_bytes": len(contents),
             "exif_has_data": exif_res.get("has_exif", False),
             "metadata_verdict": exif_res.get("metadata_verdict"),
@@ -233,6 +249,7 @@ async def analyze_image(
         timestamp=timestamp,
         filename=filename,
         sha256=sha256_hash,
+        md5=md5_hash,
         file_size_bytes=len(contents),
         dimensions=[metadata["width"], metadata["height"]],
         prediction=vision_res["prediction"],
@@ -246,6 +263,7 @@ async def analyze_image(
         exif=ExifMetadata(**exif_res),
         frequency=FrequencyMetrics(**freq_res),
         gradcam_url=vision_res.get("gradcam_url"),
+        custodian_name=effective_custodian,
         evidence=evidence,
         checks_performed=checks_performed,
         checks_unavailable=checks_unavailable,

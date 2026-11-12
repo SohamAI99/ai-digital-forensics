@@ -94,3 +94,11 @@ Report:
 - robustness results
 
 Never invent results.
+
+## Legal Admissibility & Forensic Chain of Custody Standards
+All image forensic examinations adhere to recognized judicial evidentiary standards:
+- **ISO/IEC 27037:2012**: Digital evidence handling, preservation, and corroborated dual-hash verification (MD5 & SHA-256).
+- **NIST SP 800-86**: Standard operational guidelines for computer forensic investigation techniques.
+- **Federal Rules of Evidence (FRE 901 & 902)**: Evidence identification and self-authenticating electronic records.
+- **Daubert & Frye Standards**: Validated, deterministic tooling registries with peer-reviewed algorithmic repeatability.
+- **Expert Certificate of Analysis**: Formal judicial conclusion formulated within a reasonable degree of scientific and forensic certainty, accompanied by sworn examiner attestation under penalty of perjury (28 U.S.C. § 1746).

@@ -103,6 +103,7 @@ class ImageAnalyzeResponse(BaseModel):
     timestamp: str
     filename: str
     sha256: str
+    md5: Optional[str] = None
     file_size_bytes: int
     dimensions: List[int]
     prediction: str
@@ -116,6 +117,7 @@ class ImageAnalyzeResponse(BaseModel):
     exif: ExifMetadata
     frequency: FrequencyMetrics
     gradcam_url: Optional[str] = None
+    custodian_name: Optional[str] = "Soyam Maji (Soyam08)"
     evidence: List[EvidenceItem]
     checks_performed: List[str]
     checks_unavailable: List[str]

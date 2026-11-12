@@ -38,11 +38,14 @@ export async function analyzeEmail(text?: string, file?: File): Promise<EmailAna
   return res.json();
 }
 
-export async function analyzeImage(file: File): Promise<ImageAnalyzeResponse> {
+export async function analyzeImage(file: File, custodianName?: string): Promise<ImageAnalyzeResponse> {
   const formData = new FormData();
   formData.append('file', file);
   if (file.lastModified) {
     formData.append('file_last_modified', new Date(file.lastModified).toISOString());
+  }
+  if (custodianName && custodianName.trim()) {
+    formData.append('custodian_name', custodianName.trim());
   }
 
   const res = await fetch(`${API_BASE}/image/analyze`, {

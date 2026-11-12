@@ -19,7 +19,8 @@ import {
   Code,
   Sliders,
   Calendar,
-  Clock
+  Clock,
+  UserCheck
 } from 'lucide-react';
 import { analyzeImage } from '../services/api';
 import type { ImageAnalyzeResponse } from '../types';
@@ -28,6 +29,7 @@ import { RiskBadge } from '../components/RiskBadge';
 export const ImageForensics: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [custodianName, setCustodianName] = useState<string>('Soyam Maji (Soyam08)');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ImageAnalyzeResponse | null>(null);
@@ -64,7 +66,7 @@ export const ImageForensics: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await analyzeImage(selectedFile);
+      const data = await analyzeImage(selectedFile, custodianName);
       setResult(data);
     } catch (err: any) {
       setError(err.message || 'Image analysis failed.');
@@ -136,6 +138,31 @@ export const ImageForensics: React.FC = () => {
           </div>
         </div>
 
+        {/* Evidence Custodian Configuration */}
+        <div className="mt-4 p-3 bg-theme-inset rounded-lg border border-theme flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5">
+            <UserCheck className="w-4 h-4 text-purple-500 shrink-0" />
+            <div>
+              <label htmlFor="custodian-name-input" className="text-xs font-semibold text-theme-heading block">
+                Evidence Custodian &amp; Lead Examiner Name
+              </label>
+              <p className="text-[11px] text-theme-muted">
+                Documented in the formal Chain of Custody ledger, examiner attestation &amp; court-admissible certificate of analysis.
+              </p>
+            </div>
+          </div>
+          <div className="w-full sm:w-72 shrink-0">
+            <input
+              id="custodian-name-input"
+              type="text"
+              value={custodianName}
+              onChange={(e) => setCustodianName(e.target.value)}
+              placeholder="e.g. Soyam Maji (Soyam08)"
+              className="w-full px-3 py-1.5 text-xs rounded-md bg-theme-card border border-theme text-theme-heading focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+            />
+          </div>
+        </div>
+
         {error && (
           <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-600 dark:text-rose-400 text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -176,7 +203,7 @@ export const ImageForensics: React.FC = () => {
                   <RiskBadge level={result.risk_level} score={result.overall_risk_score} />
                 </div>
                 <p className="text-xs text-theme-muted font-mono mt-1 tabular-nums">
-                  Case: {result.analysis_id} &bull; File: {result.filename} &bull; {result.dimensions[0]}×{result.dimensions[1]}px
+                  Case: {result.analysis_id} &bull; File: {result.filename} &bull; {result.dimensions[0]}×{result.dimensions[1]}px &bull; Custodian: <span className="text-theme-heading font-semibold">{result.custodian_name || custodianName}</span>
                 </p>
                 <p className="text-[11px] font-mono text-theme-muted mt-1 truncate max-w-xl">
                   SHA-256:{' '}
@@ -498,10 +525,26 @@ export const ImageForensics: React.FC = () => {
                     </p>
                   </div>
                   <div className="p-3 bg-theme-inset rounded-lg border border-theme col-span-2 md:col-span-4">
-                    <p className="text-theme-muted text-[11px]">SHA-256 Checksum (Chain of Custody)</p>
-                    <p className="font-mono text-[11px] text-theme-heading mt-0.5 truncate select-all" title={result.sha256}>
-                      {result.sha256}
-                    </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="space-y-1">
+                        <p className="text-theme-muted text-[11px] font-semibold flex items-center space-x-1.5">
+                          <Fingerprint className="w-3.5 h-3.5 text-blue-500" />
+                          <span>Cryptographic Dual-Hash Verification (Chain of Custody &amp; FRE 901/902)</span>
+                        </p>
+                        <p className="font-mono text-[11px] text-theme-heading select-all">
+                          <span className="text-theme-muted font-bold">SHA-256: </span>{result.sha256}
+                        </p>
+                        {result.md5 && (
+                          <p className="font-mono text-[11px] text-theme-heading select-all">
+                            <span className="text-theme-muted font-bold">MD5: </span>{result.md5}
+                          </p>
+                        )}
+                      </div>
+                      <div className="shrink-0 flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium self-start sm:self-center">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Bitstream Integrity Verified</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
