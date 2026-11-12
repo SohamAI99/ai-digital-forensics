@@ -1,5 +1,6 @@
 import uuid
 import cv2
+import hashlib
 from datetime import datetime, timezone
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from backend.app.schemas import ImageAnalyzeResponse, ExifMetadata, FrequencyMetrics, EvidenceItem
@@ -23,13 +24,15 @@ async def analyze_image(file: UploadFile = File(...)):
     analysis_id = f"IMG-{uuid.uuid4().hex[:8].upper()}"
     timestamp = datetime.now(timezone.utc).isoformat()
 
-    # 1. Validate and load image
+    # 1. Validate and load image + compute cryptographic SHA-256
     try:
         img_bgr, pil_img, metadata = image_preprocessor_service.validate_and_load(contents, filename)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image processing error: {e}")
+
+    sha256_hash = metadata.get("sha256") or hashlib.sha256(contents).hexdigest()
 
     # Save original image to artifacts
     orig_filename = f"orig_{analysis_id}.jpg"
@@ -129,6 +132,7 @@ async def analyze_image(file: UploadFile = File(...)):
         risk_level = "Low Risk"
 
     checks_performed = [
+        "Cryptographic SHA-256 image integrity verification",
         "Pillow EXIF hardware and software metadata parsing",
         "OpenCV facial landmark and region extraction",
         "NumPy 2D Fast Fourier Transform (FFT) log-magnitude spectrum",
@@ -152,6 +156,7 @@ async def analyze_image(file: UploadFile = File(...)):
     report_dict = {
         "analysis_id": analysis_id,
         "filename": filename,
+        "sha256": sha256_hash,
         "prediction": vision_res["prediction"],
         "deepfake_probability": vision_res["deepfake_probability"],
         "pristine_probability": vision_res["pristine_probability"],
@@ -184,8 +189,11 @@ async def analyze_image(file: UploadFile = File(...)):
             "pristine_probability": vision_res["pristine_probability"],
             "face_detected": face_detected,
             "dimensions": [metadata["width"], metadata["height"]],
+            "sha256": sha256_hash,
+            "file_size_bytes": len(contents),
             "exif_has_data": exif_res.get("has_exif", False),
-            "high_freq_ratio": freq_res.get("high_freq_ratio")
+            "high_freq_ratio": freq_res.get("high_freq_ratio"),
+            "evidence_list": [ev.model_dump() for ev in evidence]
         },
         report_pdf_path=report_pdf_path
     )
@@ -194,6 +202,7 @@ async def analyze_image(file: UploadFile = File(...)):
         analysis_id=analysis_id,
         timestamp=timestamp,
         filename=filename,
+        sha256=sha256_hash,
         file_size_bytes=len(contents),
         dimensions=[metadata["width"], metadata["height"]],
         prediction=vision_res["prediction"],

@@ -4,6 +4,7 @@ from pathlib import Path
 
 # Base paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+os.environ.setdefault("TORCH_HOME", str(PROJECT_ROOT / ".cache" / "torch"))
 BACKEND_DIR = PROJECT_ROOT / "backend"
 STORAGE_DIR = BACKEND_DIR / "storage"
 UPLOADS_DIR = STORAGE_DIR / "uploads"

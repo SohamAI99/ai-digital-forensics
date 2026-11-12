@@ -31,6 +31,7 @@ def test_email_analyze_endpoint():
     assert data["prediction"] == "Phishing Email"
     assert data["risk_level"] in ["High Risk", "Medium Risk"]
     assert len(data["evidence"]) > 0
+    assert "parsed_metadata" in data
 
 def test_history_endpoint():
     response = client.get("/api/history")
@@ -63,6 +64,8 @@ def test_image_analyze_endpoint():
     assert "deepfake_probability" in data
     assert "gradcam_url" in data
     assert "frequency" in data
+    assert "sha256" in data
+    assert len(data["sha256"]) == 64
 
     # Test report PDF download endpoint
     analysis_id = data["analysis_id"]
@@ -70,8 +73,19 @@ def test_image_analyze_endpoint():
     assert rep_resp.status_code == 200
     assert rep_resp.headers["content-type"] == "application/pdf"
 
+    # Test report singular alias
+    rep_sing_resp = client.get(f"/api/report/{analysis_id}/pdf")
+    assert rep_sing_resp.status_code == 200
+    assert rep_sing_resp.headers["content-type"] == "application/pdf"
+
     # Test single history item endpoint
     hist_resp = client.get(f"/api/history/{analysis_id}")
     assert hist_resp.status_code == 200
     hist_data = hist_resp.json()
     assert hist_data["id"] == analysis_id
+
+    # Test /api/analysis/{id} alias
+    alias_resp = client.get(f"/api/analysis/{analysis_id}")
+    assert alias_resp.status_code == 200
+    alias_data = alias_resp.json()
+    assert alias_data["id"] == analysis_id

@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import hashlib
 from PIL import Image
 from typing import Dict, Any, Tuple, Optional
 from backend.app.config import ARTIFACTS_DIR
@@ -16,7 +17,7 @@ class ImagePreprocessorService:
     @staticmethod
     def validate_and_load(file_bytes: bytes, filename: str) -> Tuple[np.ndarray, Image.Image, Dict[str, Any]]:
         """
-        Validates image size, format, and decodes safely.
+        Validates image size, format, SHA-256 cryptographic hash, and decodes safely.
         Returns:
             (cv2_bgr_array, pil_image, metadata)
         """
@@ -26,6 +27,9 @@ class ImagePreprocessorService:
         ext = os.path.splitext(filename)[1].lower()
         if ext not in ImagePreprocessorService.ALLOWED_EXTENSIONS:
             raise ValueError(f"Unsupported file format '{ext}'. Allowed formats: JPG, JPEG, PNG, WEBP.")
+
+        # Compute SHA-256 hash for forensic chain of custody
+        sha256_hash = hashlib.sha256(file_bytes).hexdigest()
 
         # Decode using OpenCV from byte buffer
         nparr = np.frombuffer(file_bytes, np.uint8)
@@ -47,7 +51,9 @@ class ImagePreprocessorService:
             "height": height,
             "channels": channels,
             "format": pil_img.format or ext.replace(".", "").upper(),
-            "mode": pil_img.mode
+            "mode": pil_img.mode,
+            "sha256": sha256_hash,
+            "size_bytes": len(file_bytes)
         }
 
         return img_bgr, pil_img, metadata
@@ -77,16 +83,15 @@ class ImagePreprocessorService:
             y1 = max(0, y - my)
             x2 = min(w, x + fw + mx)
             y2 = min(h, y + fh + my)
-            
             face_crop = img_bgr[y1:y2, x1:x2]
             cv2.imwrite(str(crop_path), face_crop)
             return True, f"/artifacts/{crop_filename}", face_crop
         else:
-            # Center crop fallback
+            # Fallback center-crop
             min_dim = min(h, w)
-            cy, cx = h // 2, w // 2
-            half = min_dim // 2
-            center_crop = img_bgr[cy - half:cy + half, cx - half:cx + half]
+            y1 = (h - min_dim) // 2
+            x1 = (w - min_dim) // 2
+            center_crop = img_bgr[y1:y1+min_dim, x1:x1+min_dim]
             cv2.imwrite(str(crop_path), center_crop)
             return False, f"/artifacts/{crop_filename}", center_crop
 

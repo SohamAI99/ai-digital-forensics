@@ -5,6 +5,7 @@ from backend.app.database import get_analysis_by_id
 from backend.app.config import REPORTS_DIR
 
 router = APIRouter(prefix="/api/reports", tags=["Forensic Reports"])
+report_singular_router = APIRouter(prefix="/api/report", tags=["Forensic Reports Alias"])
 
 @router.get("/{analysis_id}/pdf")
 def download_pdf_report(analysis_id: str):
@@ -39,3 +40,11 @@ def get_report_metadata(analysis_id: str):
         "overall_score": record.get("overall_score"),
         "pdf_download_url": f"/api/reports/{analysis_id}/pdf"
     }
+
+@report_singular_router.get("/{analysis_id}")
+def get_report_metadata_singular(analysis_id: str):
+    return get_report_metadata(analysis_id)
+
+@report_singular_router.get("/{analysis_id}/pdf")
+def download_pdf_report_singular(analysis_id: str):
+    return download_pdf_report(analysis_id)

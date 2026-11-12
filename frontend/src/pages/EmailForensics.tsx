@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Mail,
   Upload,
@@ -9,7 +9,9 @@ import {
   Info,
   Link as LinkIcon,
   Paperclip,
-  RotateCcw
+  RotateCcw,
+  AlertTriangle,
+  Globe
 } from 'lucide-react';
 import { analyzeEmail } from '../services/api';
 import type { EmailAnalyzeResponse } from '../types';
@@ -17,8 +19,11 @@ import { RiskBadge } from '../components/RiskBadge';
 
 const SAMPLE_PHISH = `From: Security Alert <service-update@account-security-alert.xyz>
 To: target-user@company.com
+Reply-To: credential-collector@suspicious-relay.net
 Subject: URGENT: Your banking access has been suspended today
 Date: Wed, 28 Oct 2026 09:14:22 +0000
+Message-ID: <20261028091422.88219.sec@account-security-alert.xyz>
+Received: from mail-relay.phishhost.top (mail-relay.phishhost.top [198.51.100.22]) by mx.targetcompany.com
 Received-SPF: fail (domain of account-security-alert.xyz does not designate permitted sender)
 Authentication-Results: spf=fail; dkim=fail; dmarc=fail
 
@@ -37,8 +42,11 @@ Corporate Security Team`;
 
 const SAMPLE_SAFE = `From: Sarah Jenkins <s.jenkins@innovatetech.org>
 To: team-lead@company.com
+Reply-To: s.jenkins@innovatetech.org
 Subject: Project sprint agenda and roadmap notes
 Date: Wed, 28 Oct 2026 10:30:00 +0000
+Message-ID: <CADe192xY92.sprint-agenda@mail.innovatetech.org>
+Received: from mail-relay.google.com (mail-relay.google.com [209.85.220.41]) by mx.company.com
 Received-SPF: pass (google.com: domain of s.jenkins@innovatetech.org designates 209.85.220.41 as permitted sender)
 Authentication-Results: spf=pass; dkim=pass (signature verified); dmarc=pass
 
@@ -56,10 +64,36 @@ export const EmailForensics: React.FC = () => {
   const [inputMode, setInputMode] = useState<'text' | 'file'>('text');
   const [emailText, setEmailText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<EmailAnalyzeResponse | null>(null);
   const [activeTab, setActiveTab] = useState<'evidence' | 'lime' | 'urls' | 'headers' | 'attachments'>('evidence');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (['eml', 'txt', 'msg'].includes(ext || '')) {
+        setSelectedFile(file);
+        setError(null);
+      } else {
+        setError('Please drop an .eml, .txt, or .msg file.');
+      }
+    }
+  };
 
   const handleAnalyze = async () => {
     if (inputMode === 'text' && !emailText.trim()) {
@@ -67,7 +101,7 @@ export const EmailForensics: React.FC = () => {
       return;
     }
     if (inputMode === 'file' && !selectedFile) {
-      setError('Please choose an .eml or .txt file to upload.');
+      setError('Please choose an .eml, .txt, or .msg file to upload.');
       return;
     }
 
@@ -91,6 +125,7 @@ export const EmailForensics: React.FC = () => {
     setSelectedFile(null);
     setError(null);
     setResult(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
@@ -119,7 +154,7 @@ export const EmailForensics: React.FC = () => {
                 inputMode === 'file' ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-theme-muted hover:text-theme-heading'
               }`}
             >
-              Upload .EML / .TXT
+              Upload .EML / .TXT / .MSG
             </button>
           </div>
         </div>
@@ -163,22 +198,37 @@ export const EmailForensics: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="p-8 border-2 border-dashed border-theme-subtle rounded-lg text-center bg-theme-inset hover:border-blue-500/50 transition">
-            <Upload className="w-10 h-10 text-theme-dim mx-auto mb-3" />
-            <p className="text-sm text-theme-heading font-medium">Select an .eml or .txt email file</p>
-            <p className="text-xs text-theme-muted mt-1 mb-4">
-              Metadata, headers, and body will be safely extracted without executing attachments.
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-8 border-2 border-dashed rounded-lg text-center bg-theme-inset transition cursor-pointer group ${
+              isDragging
+                ? 'border-blue-500 bg-blue-500/5'
+                : 'border-theme-subtle hover:border-blue-500/50'
+            }`}
+          >
+            <Upload className="w-10 h-10 text-theme-dim group-hover:text-blue-500 mx-auto mb-3 transition" />
+            <p className="text-sm text-theme-heading font-medium">
+              Drag and drop an .eml, .txt, or .msg file here, or click to browse
+            </p>
+            <p className="text-xs text-theme-muted mt-1 mb-3">
+              Metadata, headers, and body will be safely parsed without executing attachments.
             </p>
             <input
+              ref={fileInputRef}
               type="file"
               accept=".eml,.txt,.msg"
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="text-xs text-theme-muted file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+              className="hidden"
             />
-            {selectedFile && (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-3">
+            {selectedFile ? (
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-mono mt-2 font-medium">
                 Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
               </p>
+            ) : (
+              <span className="text-[11px] text-theme-muted font-mono">Max size: 10 MB</span>
             )}
           </div>
         )}
@@ -263,15 +313,12 @@ export const EmailForensics: React.FC = () => {
                     style={{ width: `${result.overall_risk_score}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-theme-muted mt-2">
-                  Multi-factor composite score (ML + heuristics + URLs + headers).
-                </p>
               </div>
 
-              {/* ML Model Phishing Score */}
+              {/* Phishing Probability */}
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
-                  <span>ML Classifier Phishing Score</span>
+                  <span>ML Phishing Probability</span>
                   <span className="font-mono text-rose-600 dark:text-rose-400 font-semibold">
                     {(result.phishing_probability * 100).toFixed(2)}%
                   </span>
@@ -282,15 +329,12 @@ export const EmailForensics: React.FC = () => {
                     style={{ width: `${result.phishing_probability * 100}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-theme-muted mt-2">
-                  TF-IDF Logistic Regression pipeline probability.
-                </p>
               </div>
 
-              {/* ML Model Legitimate Score */}
+              {/* Safe Probability */}
               <div className="p-4 rounded-lg bg-theme-inset border border-theme">
                 <div className="flex items-center justify-between text-xs text-theme-muted mb-1">
-                  <span>ML Classifier Legitimate Score</span>
+                  <span>ML Safe Probability</span>
                   <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
                     {(result.safe_probability * 100).toFixed(2)}%
                   </span>
@@ -301,20 +345,38 @@ export const EmailForensics: React.FC = () => {
                     style={{ width: `${result.safe_probability * 100}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-theme-muted mt-2">
-                  Probability of benign communication patterns.
-                </p>
               </div>
             </div>
+
+            {/* Metadata Summary Banner */}
+            {result.parsed_metadata && (
+              <div className="mt-4 pt-3 border-t border-theme grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-theme-muted">
+                <div>
+                  <span className="text-theme-heading font-medium">From:</span> {result.parsed_metadata.sender || 'N/A'}
+                </div>
+                <div>
+                  <span className="text-theme-heading font-medium">To:</span> {result.parsed_metadata.recipient || 'N/A'}
+                </div>
+                <div>
+                  <span className="text-theme-heading font-medium">Reply-To:</span>{' '}
+                  <span className={result.parsed_metadata.reply_to_mismatch ? 'text-rose-600 dark:text-rose-400 font-bold' : ''}>
+                    {result.parsed_metadata.reply_to || 'None'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-theme-heading font-medium">Relay Hops:</span> {result.parsed_metadata.received_hops ?? 0}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Results Navigation Tabs */}
+          {/* Navigation Tabs */}
           <div className="flex items-center space-x-2 border-b border-theme overflow-x-auto text-xs pb-1">
             {[
-              { id: 'evidence', label: 'Threat Evidence', icon: AlertCircle, count: result.evidence.length },
-              { id: 'lime', label: 'Explainable AI (LIME)', icon: Zap, count: result.lime_features.length },
-              { id: 'urls', label: 'URL Forensics', icon: LinkIcon, count: result.urls.length },
-              { id: 'headers', label: 'Authentication Headers', icon: Shield },
+              { id: 'evidence', label: 'Forensic Evidence', icon: AlertCircle, count: result.evidence.length },
+              { id: 'lime', label: 'LIME Explainability', icon: Zap },
+              { id: 'urls', label: 'URL Inspection', icon: LinkIcon, count: result.urls.length },
+              { id: 'headers', label: 'Authentication & Headers', icon: Shield },
               { id: 'attachments', label: 'Attachments', icon: Paperclip, count: result.attachments.length },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -325,14 +387,14 @@ export const EmailForensics: React.FC = () => {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center space-x-2 px-4 py-2.5 font-medium border-b-2 transition whitespace-nowrap cursor-pointer ${
                     isActive
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-500/10 font-semibold'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-500/10'
                       : 'border-transparent text-theme-muted hover:text-theme-heading'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>
-                  {tab.count !== undefined && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-theme-subtle text-theme-main border border-theme font-mono">
+                  {'count' in tab && tab.count !== undefined && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
                       {tab.count}
                     </span>
                   )}
@@ -341,94 +403,66 @@ export const EmailForensics: React.FC = () => {
             })}
           </div>
 
-          {/* Tab 1: Threat Evidence */}
+          {/* Tab 1: Forensic Evidence */}
           {activeTab === 'evidence' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {result.evidence.map((ev, i) => (
-                  <div
-                    key={i}
-                    className="p-4 rounded-xl bg-theme-card border border-theme shadow-theme-card flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-theme-subtle text-theme-muted border border-theme">
-                          {ev.category}
-                        </span>
-                        <span
-                          className={`text-xs font-semibold uppercase px-2 py-0.5 rounded ${
-                            ev.severity === 'high'
-                              ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400'
-                              : ev.severity === 'medium'
-                              ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400'
-                              : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                          }`}
-                        >
-                          {ev.severity} severity
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-semibold text-theme-heading mt-1">{ev.title}</h4>
-                      <p className="text-xs text-theme-main mt-1 leading-relaxed">
-                        {ev.description}
-                      </p>
-                    </div>
-                    <div className="mt-3 pt-2 border-t border-theme flex items-center justify-between text-[11px] text-theme-muted">
-                      <span>Score Impact:</span>
-                      <span className="font-mono text-blue-600 dark:text-blue-400 font-bold">
-                        +{ev.score_impact} pts
+                  <div key={i} className="p-4 rounded-xl bg-theme-card border border-theme shadow-theme-card">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        {ev.category}
+                      </span>
+                      <span
+                        className={`text-xs font-semibold uppercase px-2 py-0.5 rounded ${
+                          ev.severity === 'high'
+                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                            : ev.severity === 'medium'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                        }`}
+                      >
+                        {ev.severity} ({ev.score_impact >= 0 ? `+${ev.score_impact}` : ev.score_impact})
                       </span>
                     </div>
+                    <h5 className="text-sm font-semibold text-theme-heading">{ev.title}</h5>
+                    <p className="text-xs text-theme-main mt-1 leading-relaxed">{ev.description}</p>
                   </div>
                 ))}
               </div>
 
               {/* Writing Style Signals Summary */}
-              <div className="p-5 rounded-xl bg-theme-card border border-theme shadow-theme-card">
-                <h4 className="text-xs font-semibold text-theme-heading uppercase tracking-wider mb-3">
-                  Writing Style & Linguistic Indicators
-                </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-3">
-                  <div className="p-2.5 rounded bg-theme-inset border border-theme">
-                    <p className="text-theme-muted text-[11px]">Urgency Cues</p>
-                    <p className={`font-semibold mt-0.5 ${result.writing_style.urgency_detected ? 'text-rose-600 dark:text-rose-400' : 'text-theme-muted'}`}>
-                      {result.writing_style.urgency_detected ? 'DETECTED' : 'Not detected'}
-                    </p>
+              <div className="p-4 rounded-xl bg-theme-card border border-theme shadow-theme-card text-xs">
+                <h5 className="font-semibold text-theme-heading mb-3 flex items-center space-x-2">
+                  <Zap className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                  <span>Psychological & Social Engineering Signals</span>
+                </h5>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-2.5 bg-theme-inset rounded-lg border border-theme">
+                    <span className="text-theme-muted block text-[10px]">Urgency / Pressure:</span>
+                    <span className={`font-semibold ${result.writing_style.urgency_detected ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      {result.writing_style.urgency_detected ? 'Detected' : 'None'}
+                    </span>
                   </div>
-                  <div className="p-2.5 rounded bg-theme-inset border border-theme">
-                    <p className="text-theme-muted text-[11px]">Credential Solicitations</p>
-                    <p className={`font-semibold mt-0.5 ${result.writing_style.credential_harvest_detected ? 'text-rose-600 dark:text-rose-400' : 'text-theme-muted'}`}>
-                      {result.writing_style.credential_harvest_detected ? 'DETECTED' : 'Not detected'}
-                    </p>
+                  <div className="p-2.5 bg-theme-inset rounded-lg border border-theme">
+                    <span className="text-theme-muted block text-[10px]">Credential Solicitation:</span>
+                    <span className={`font-semibold ${result.writing_style.credential_harvest_detected ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      {result.writing_style.credential_harvest_detected ? 'Detected' : 'None'}
+                    </span>
                   </div>
-                  <div className="p-2.5 rounded bg-theme-inset border border-theme">
-                    <p className="text-theme-muted text-[11px]">Threat/Coercion</p>
-                    <p className={`font-semibold mt-0.5 ${result.writing_style.threat_detected ? 'text-rose-600 dark:text-rose-400' : 'text-theme-muted'}`}>
-                      {result.writing_style.threat_detected ? 'DETECTED' : 'Not detected'}
-                    </p>
+                  <div className="p-2.5 bg-theme-inset rounded-lg border border-theme">
+                    <span className="text-theme-muted block text-[10px]">Coercive Threat:</span>
+                    <span className={`font-semibold ${result.writing_style.threat_detected ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      {result.writing_style.threat_detected ? 'Detected' : 'None'}
+                    </span>
                   </div>
-                  <div className="p-2.5 rounded bg-theme-inset border border-theme">
-                    <p className="text-theme-muted text-[11px]">Excessive Punctuation</p>
-                    <p className={`font-semibold mt-0.5 ${result.writing_style.excessive_punctuation ? 'text-amber-600 dark:text-amber-400' : 'text-theme-muted'}`}>
-                      {result.writing_style.excessive_punctuation ? 'FLAGGED' : 'Normal'}
-                    </p>
+                  <div className="p-2.5 bg-theme-inset rounded-lg border border-theme">
+                    <span className="text-theme-muted block text-[10px]">Punctuation Density:</span>
+                    <span className={`font-semibold ${result.writing_style.excessive_punctuation ? 'text-amber-600 dark:text-amber-400' : 'text-theme-heading'}`}>
+                      {result.writing_style.excessive_punctuation ? 'High Anomaly' : 'Normal'}
+                    </span>
                   </div>
                 </div>
-
-                {result.writing_style.detected_keywords.length > 0 && (
-                  <div>
-                    <p className="text-[11px] text-theme-muted mb-2">Flagged vocabulary tokens in body:</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {result.writing_style.detected_keywords.map((kw, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-0.5 rounded text-[11px] bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 font-mono"
-                        >
-                          "{kw}"
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -548,17 +582,58 @@ export const EmailForensics: React.FC = () => {
             </div>
           )}
 
-          {/* Tab 4: Authentication Headers */}
+          {/* Tab 4: Authentication Headers & Live DNS */}
           {activeTab === 'headers' && (
             <div className="p-6 rounded-xl bg-theme-card border border-theme shadow-theme-card space-y-4">
               <h4 className="text-sm font-semibold text-theme-heading flex items-center space-x-2">
                 <Shield className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-                <span>Recorded Email Authentication Headers</span>
+                <span>RFC 822 Email Headers & Authentication Analysis</span>
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              {/* Reply-To Mismatch Alert */}
+              {result.parsed_metadata?.reply_to_mismatch && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300 flex items-start space-x-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
+                  <div>
+                    <b>CRITICAL SPOOFING INDICATOR:</b> Reply-To domain does not match From address domain.
+                    Replies will be silently redirected to:{' '}
+                    <span className="font-mono font-bold underline">{result.parsed_metadata.reply_to}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Core Header Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-                  <p className="text-theme-muted font-mono text-[11px]">SPF Header Notation</p>
+                  <span className="text-theme-muted text-[10px] block">Sender (From):</span>
+                  <span className="font-mono text-theme-heading font-medium truncate block">
+                    {result.parsed_metadata?.sender || 'None'}
+                  </span>
+                </div>
+                <div className="p-3 bg-theme-inset rounded-lg border border-theme">
+                  <span className="text-theme-muted text-[10px] block">Recipient (To):</span>
+                  <span className="font-mono text-theme-heading font-medium truncate block">
+                    {result.parsed_metadata?.recipient || 'None'}
+                  </span>
+                </div>
+                <div className="p-3 bg-theme-inset rounded-lg border border-theme">
+                  <span className="text-theme-muted text-[10px] block">Reply-To:</span>
+                  <span className="font-mono text-theme-heading font-medium truncate block">
+                    {result.parsed_metadata?.reply_to || 'None'}
+                  </span>
+                </div>
+                <div className="p-3 bg-theme-inset rounded-lg border border-theme">
+                  <span className="text-theme-muted text-[10px] block">Relay Hops (Received):</span>
+                  <span className="font-mono text-theme-heading font-semibold">
+                    {result.parsed_metadata?.received_hops ?? 0} hops
+                  </span>
+                </div>
+              </div>
+
+              {/* Recorded Authentication Notations */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs mt-2">
+                <div className="p-3 bg-theme-inset rounded-lg border border-theme">
+                  <p className="text-theme-muted font-mono text-[11px]">Recorded SPF Result</p>
                   <p className="font-semibold text-theme-heading mt-1">
                     {result.authentication_headers.spf_result || 'Unknown'}
                   </p>
@@ -567,7 +642,7 @@ export const EmailForensics: React.FC = () => {
                   </p>
                 </div>
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-                  <p className="text-theme-muted font-mono text-[11px]">DKIM Status</p>
+                  <p className="text-theme-muted font-mono text-[11px]">Recorded DKIM Result</p>
                   <p className="font-semibold text-theme-heading mt-1">
                     {result.authentication_headers.dkim_result || 'None'}
                   </p>
@@ -576,19 +651,46 @@ export const EmailForensics: React.FC = () => {
                   </p>
                 </div>
                 <div className="p-3 bg-theme-inset rounded-lg border border-theme">
-                  <p className="text-theme-muted font-mono text-[11px]">DMARC Status</p>
+                  <p className="text-theme-muted font-mono text-[11px]">Recorded DMARC Result</p>
                   <p className="font-semibold text-theme-heading mt-1">
                     {result.authentication_headers.dmarc_result || 'None'}
                   </p>
                 </div>
               </div>
 
+              {/* Live DNS Verification Section */}
+              {result.authentication_headers?.live_dns && (
+                <div className="p-4 bg-theme-inset rounded-lg border border-theme text-xs space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Globe className="w-4 h-4 text-blue-500" />
+                    <span className="font-semibold text-theme-heading">
+                      Live DNS Verification ({result.authentication_headers.live_dns.domain || 'Domain'})
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-theme-muted">
+                      {result.authentication_headers.live_dns.dns_status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <span className="text-theme-muted text-[10px] block">Public SPF TXT Record:</span>
+                      <code className="text-[11px] text-blue-600 dark:text-blue-400 break-all">
+                        {result.authentication_headers.live_dns.spf_record || 'No SPF record found in public DNS'}
+                      </code>
+                    </div>
+                    <div>
+                      <span className="text-theme-muted text-[10px] block">Public DMARC TXT Record:</span>
+                      <code className="text-[11px] text-blue-600 dark:text-blue-400 break-all">
+                        {result.authentication_headers.live_dns.dmarc_record || 'No DMARC record found in public DNS'}
+                      </code>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 flex items-start space-x-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
-                  <b>Forensic Distinction Note:</b> Authentication results shown above were read
-                  strictly from recorded headers in the email message. The system does not claim
-                  to have performed independent DNS key cryptographic verification.
+                  <b>Forensic Chain-of-Custody Note:</b> Header records reflect values transmitted within the email file. Live DNS lookups independently query current root nameservers for SPF and DMARC TXT records.
                 </span>
               </div>
             </div>
@@ -608,6 +710,7 @@ export const EmailForensics: React.FC = () => {
                     <thead className="text-theme-muted bg-theme-inset border-b border-theme">
                       <tr>
                         <th className="py-2.5 px-3">File Name</th>
+                        <th className="py-2.5 px-3">MIME Type</th>
                         <th className="py-2.5 px-3">Extension</th>
                         <th className="py-2.5 px-3">Size</th>
                         <th className="py-2.5 px-3">SHA-256 Hash</th>
@@ -618,6 +721,9 @@ export const EmailForensics: React.FC = () => {
                       {result.attachments.map((att, i) => (
                         <tr key={i} className="hover:bg-theme-subtle/50 transition">
                           <td className="py-2.5 px-3 font-medium text-theme-heading">{att.filename}</td>
+                          <td className="py-2.5 px-3 font-mono text-[11px] text-blue-600 dark:text-blue-400">
+                            {att.mime_type || 'application/octet-stream'}
+                          </td>
                           <td className="py-2.5 px-3 font-mono">{att.extension}</td>
                           <td className="py-2.5 px-3 font-mono">{(att.size_bytes / 1024).toFixed(1)} KB</td>
                           <td className="py-2.5 px-3 font-mono text-[11px] text-theme-muted truncate max-w-xs">

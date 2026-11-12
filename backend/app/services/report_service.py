@@ -115,10 +115,10 @@ class ReportService:
         # Methodologies & Disclaimer
         elements.append(Paragraph("Methodology & Forensic Disclaimer", h2_style))
         disclaimer_text = (
-            "This report was generated using a TF-IDF + Logistic Regression statistical pipeline alongside lexical heuristics "
-            "and header analysis. Model scores represent empirical probabilities calculated on the training corpus and should not "
-            "be considered absolute mathematical certainty. External checks not performed include live DNS SPF/DKIM verification "
-            "and live malware sandbox execution."
+            "This report was generated using a TF-IDF + Logistic Regression statistical pipeline alongside lexical heuristics, "
+            "RFC 822 header inspection, and live DNS authentication verification where accessible. Model scores represent empirical probabilities "
+            "calculated on the training corpus and should not be considered absolute mathematical certainty. External checks not performed "
+            "include live malware sandbox execution."
         )
         elements.append(Paragraph(disclaimer_text, body_style))
 
@@ -178,6 +178,7 @@ class ReportService:
         # Summary Table
         summary_table_data = [
             [Paragraph("<b>Target File Name</b>", body_style), Paragraph(str(data.get('filename', 'Unknown')), body_style)],
+            [Paragraph("<b>SHA-256 Hash</b>", body_style), Paragraph(f"<font size='7'>{data.get('sha256', 'N/A')}</font>", body_style)],
             [Paragraph("<b>Forensic Classification</b>", body_style), Paragraph(f"<b>{data.get('prediction', 'Unknown')}</b>", body_style)],
             [Paragraph("<b>Deepfake Probability</b>", body_style), Paragraph(f"{data.get('deepfake_probability', 0)*100:.2f}%", body_style)],
             [Paragraph("<b>Authentic Probability</b>", body_style), Paragraph(f"{data.get('pristine_probability', 0)*100:.2f}%", body_style)],

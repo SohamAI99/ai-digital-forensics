@@ -9,8 +9,8 @@ from backend.app.database import init_db
 from backend.app.api.email_routes import router as email_router
 from backend.app.api.image_routes import router as image_router
 from backend.app.api.dashboard_routes import router as dashboard_router
-from backend.app.api.history_routes import router as history_router
-from backend.app.api.reports_routes import router as reports_router
+from backend.app.api.history_routes import router as history_router, analysis_router
+from backend.app.api.reports_routes import router as reports_router, report_singular_router
 
 # Initialize database tables
 init_db()
@@ -39,7 +39,9 @@ app.include_router(dashboard_router)
 app.include_router(email_router)
 app.include_router(image_router)
 app.include_router(history_router)
+app.include_router(analysis_router)
 app.include_router(reports_router)
+app.include_router(report_singular_router)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

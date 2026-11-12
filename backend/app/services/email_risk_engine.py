@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from backend.app.schemas import EvidenceItem
 from backend.app.config import RISK_LOW_MAX, RISK_MEDIUM_MAX
 
@@ -9,7 +9,8 @@ class EmailRiskEngine:
         writing_style: Dict[str, Any],
         urls_analysis: List[Dict[str, Any]],
         attachments: List[Dict[str, Any]],
-        auth_headers: Dict[str, Any]
+        auth_headers: Dict[str, Any],
+        parsed_info: Optional[Dict[str, Any]] = None
     ) -> Tuple[str, float, List[EvidenceItem], List[str], List[str], List[str]]:
         """
         Calculates an explainable overall risk score (0-100) and risk level.
@@ -21,11 +22,12 @@ class EmailRiskEngine:
             "Urgency and coercive language detection",
             "Credential harvesting keyword search",
             "Lexical URL analysis (IP host, brand spoofing, suspicious TLDs)",
-            "Attachment metadata and file extension inspection"
+            "Attachment metadata, MIME type and file extension inspection",
+            "RFC 822 header discrepancy and relay hop tracking",
+            "Live DNS SPF and DMARC record verification via dnspython"
         ]
         
         checks_unavailable = [
-            "Live DNS cryptographic SPF/DKIM verification (only recorded headers inspected)",
             "External threat intelligence sandbox scanning (VirusTotal key optional/offline)",
             "Live URL crawling / payload sandbox execution (prohibited for safety)"
         ]
@@ -33,7 +35,8 @@ class EmailRiskEngine:
         limitations = [
             "Model scores are statistical estimates based on Kaggle phishing corpus, not cryptographic proof.",
             "Spoofed emails with clean text and no malicious links may achieve lower risk scores.",
-            "Missing external threat intelligence does not imply the email is safe."
+            "Missing external threat intelligence does not imply the email is safe.",
+            "Network conditions or firewall rules may affect live DNS TXT lookups."
         ]
 
         # 1. Base ML Model Score (weight up to 50 points)
@@ -145,7 +148,7 @@ class EmailRiskEngine:
                 evidence.append(EvidenceItem(
                     category="attachment",
                     title=f"High-Risk Executable Attachment: {att['filename']}",
-                    description="Executable or script payload detected in email attachment metadata.",
+                    description=f"Dangerous payload ({att.get('mime_type', 'binary')}) detected with hash {att.get('sha256', '')[:12]}...",
                     severity="high",
                     score_impact=15.0
                 ))
@@ -163,7 +166,18 @@ class EmailRiskEngine:
 
         total_score += min(att_score, 15.0)
 
-        # 5. Recorded Authentication Headers
+        # 5. Header Anomalies (Reply-To mismatch)
+        if parsed_info and parsed_info.get("reply_to_mismatch"):
+            total_score += 15.0
+            evidence.append(EvidenceItem(
+                category="headers",
+                title="Reply-To Domain Mismatch Detected",
+                description=f"Reply-To address '{parsed_info.get('reply_to')}' points to a different domain than sender '{parsed_info.get('sender')}'.",
+                severity="high",
+                score_impact=15.0
+            ))
+
+        # 6. Recorded & Live Authentication Headers
         spf_res = auth_headers.get("spf_result", "Unknown")
         dkim_res = auth_headers.get("dkim_result", "None")
         if spf_res == "Fail/Softfail" or dkim_res == "Fail":
@@ -184,6 +198,27 @@ class EmailRiskEngine:
                 severity="info",
                 score_impact=-10.0
             ))
+
+        # Check live DNS SPF/DMARC result if available
+        live_dns = auth_headers.get("live_dns", {})
+        if live_dns.get("live_dns_checked"):
+            if not live_dns.get("spf_record") and not live_dns.get("dmarc_record"):
+                evidence.append(EvidenceItem(
+                    category="authentication",
+                    title="Missing DNS SPF and DMARC Protection",
+                    description=f"Sender domain '{live_dns.get('domain')}' has neither SPF nor DMARC TXT records published in public DNS.",
+                    severity="medium",
+                    score_impact=5.0
+                ))
+                total_score += 5.0
+            elif live_dns.get("dmarc_record"):
+                evidence.append(EvidenceItem(
+                    category="authentication",
+                    title="Published DMARC Policy Verified",
+                    description=f"Sender domain published valid DMARC TXT record in DNS.",
+                    severity="info",
+                    score_impact=0.0
+                ))
 
         # Clamp between 0.0 and 100.0
         final_score = max(0.0, min(100.0, round(total_score, 1)))

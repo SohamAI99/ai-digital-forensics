@@ -27,6 +27,7 @@ class UrlFinding(BaseModel):
 class AttachmentFinding(BaseModel):
     filename: str
     extension: str
+    mime_type: Optional[str] = None
     size_bytes: int
     sha256: str
     risk_level: str
@@ -75,6 +76,7 @@ class ExifMetadata(BaseModel):
     has_exif: bool
     anomaly_flags: List[str] = []
     raw_tags: Dict[str, Any] = {}
+    gps_info: Optional[Dict[str, Any]] = None
 
 class FrequencyMetrics(BaseModel):
     fft_spectrum_url: Optional[str] = None
@@ -88,6 +90,7 @@ class ImageAnalyzeResponse(BaseModel):
     analysis_id: str
     timestamp: str
     filename: str
+    sha256: str
     file_size_bytes: int
     dimensions: List[int]
     prediction: str

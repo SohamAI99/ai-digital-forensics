@@ -36,6 +36,9 @@ backend/storage/artifacts/
 backend/storage/uploads/
 backend/storage/reports/
 
+# ── Cache ─────────────────────────────────────────────────────
+.cache/
+
 # ── Large Dataset (49 MB CSV — not required to run) ───────────
 # The model is pre-trained; dataset not needed to run the app.
 # Store in Google Drive / Kaggle if needed for re-training.
@@ -75,8 +78,7 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
-# ── Jupyter Notebooks (optional — remove if you want to keep) ─
-# Uncomment below to exclude the notebook from the repo
+# ── Jupyter Notebooks ─────────────────────────────────────────
 # *.ipynb
 
 # ── Logs ──────────────────────────────────────────────────────
@@ -88,7 +90,3 @@ logs/
 *.bak
 .mypy_cache/
 .ruff_cache/
-<<<<<<< HEAD
-
-=======
->>>>>>> 878ebbdbf16f1426a59ec5077915d935b78d4c44
