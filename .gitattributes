@@ -1,0 +1,11 @@
+# Treat binary files as binary
+*.pdf binary
+*.joblib binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.webp binary
+
+# Auto detect text files and perform LF normalization
+* text=auto

@@ -29,7 +29,8 @@
 <p>
   <img src="https://img.shields.io/badge/Email_Model_Accuracy-98.20%25-10b981?style=for-the-badge" alt="Accuracy"/>
   <img src="https://img.shields.io/badge/Email_F1_Score-0.9762-10b981?style=for-the-badge" alt="F1"/>
-  <img src="https://img.shields.io/badge/Backend_Tests-18%2F18_Passing-10b981?style=for-the-badge" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Backend_Tests-24%2F24_Passing-10b981?style=for-the-badge" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Compliance-ISO%2FIEC_27037-blue?style=for-the-badge" alt="ISO 27037"/>
   <img src="https://img.shields.io/badge/License-Not_Yet_Selected-94a3b8?style=for-the-badge" alt="License"/>
 </p>
 
@@ -46,7 +47,10 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Academic Project Report (7th Sem / B.Tech Capstone)](docs/ACADEMIC_PROJECT_REPORT.md)
+- [Technical & API Specification](docs/TECHNICAL_API_DOCUMENTATION.md)
 - [Forensic Modules](#-forensic-modules)
+- [Court Admissibility & Legal Standards](#-court-admissibility--legal-standards)
 - [Key Features](#-key-features)
 - [Technology Stack](#-technology-stack)
 - [Screenshots](#-screenshots)
@@ -94,20 +98,35 @@ Analyses raw email text through a multi-layer risk pipeline:
 
 ### Module B — Deepfake Image Forensics
 
-Analyses uploaded images through a computer-vision forensic pipeline:
+Analyses uploaded images through an advanced computer-vision and cryptographic forensic pipeline:
 
 | Layer | Technique | Implementation |
 |---|---|---|
-| **Image Validation** | Format verification, corruption detection | `Pillow`, `OpenCV` |
-| **Face Detection** | Haar cascade with fallback centre-crop | `OpenCV` |
-| **Deepfake Classification** | ResNet-18 + Forensic Classification Head | `PyTorch`, `torchvision` |
-| **Grad-CAM Explainability** | Layer 4 activation map overlays | `PyTorch` hooks |
-| **FFT Analysis** | 2D Fast Fourier Transform, log-magnitude spectrum | `NumPy`, `OpenCV` |
-| **DCT Analysis** | 2D Discrete Cosine Transform coefficient energy | `scipy.fftpack` |
-| **EXIF Inspection** | Camera metadata extraction, anomaly flagging | `Pillow` |
-| **PDF Report** | Visual forensic examination report with embedded images | `reportlab` |
+| **Cryptographic Corroboration** | Dual-hash bitstream verification (MD5 + SHA-256) | `hashlib` (ISO/IEC 27037 & FRE 902) |
+| **Image Validation** | Format verification, corruption detection, bit depth | `Pillow`, `OpenCV` |
+| **Face & Biometric Crop** | Haar cascade with fallback centre-crop | `OpenCV` |
+| **Deepfake Classification** | ResNet-18 + Forensic Spatial-Residual Classification Head | `PyTorch`, `torchvision` |
+| **Grad-CAM Explainability** | Layer 4 activation map overlays (saliency heatmap) | `PyTorch` hooks |
+| **2D FFT Spectrum** | 2D Fast Fourier Transform, log-magnitude spectrum | `NumPy`, `OpenCV` |
+| **2D DCT Spectrum** | 2D Discrete Cosine Transform coefficient energy | `scipy.fftpack` |
+| **EXIF & Hardware Profiling**| Camera make/model, optics, ISO, exposure, software stamps | `Pillow`, custom forensic parser |
+| **JPEG Stream Introspection** | SOF0 chroma subsampling (4:2:0/4:2:2/4:4:4) & DQT quality estimation | Binary header parser |
+| **Temporal Provenance** | Capture vs. modification timestamps with FRE 901 consistency check | Header + OS timestamp reconciliation |
+| **Court-Admissible PDF Report**| 12-section judicial certificate with dynamic custodian, exhibits & sworn declaration | `reportlab` (Two-Pass Numbered Canvas) |
 
 Both modules are **fully independent** — they share only the FastAPI infrastructure and SQLite database, never mixing email content with image data.
+
+---
+
+## ⚖️ Court Admissibility & Legal Standards
+
+AEGIS FORENSICS implements strict digital evidence custody and scientific reliability mechanisms:
+
+- **ISO/IEC 27037:2012 Compliance**: Enforces digital evidence handling standards across auditability, repeatability, reproducibility, and justifiability.
+- **Federal Rules of Evidence (FRE Rule 901 & 902)**: Satisfies evidentiary authentication via temporal consistency checks and self-authenticating electronic records through **dual-hash cryptographic verification (MD5 + SHA-256)**.
+- **Daubert / Frye Scientific Standard**: Meets legal criteria for expert scientific testimony through peer-reviewed algorithms (ResNet-18, Grad-CAM, LIME, 2D FFT) and benchmarked error rates documented directly in Section 3 of the examination report.
+- **Dynamic Evidence Custodian**: The Lead Forensic Examiner / Evidence Custodian name is configured dynamically per case, flowing into administrative case records, custody transfer logs, and the sworn signature block.
+- **Statutory Examiner Attestation (28 U.S.C. § 1746)**: Generated PDF reports conclude with a formal unsworn declaration under penalty of perjury and digital verification seal.
 
 ---
 
@@ -129,18 +148,22 @@ Both modules are **fully independent** — they share only the FastAPI infrastru
 
 ### 🖼️ Image Forensics
 - **Drag-and-Drop Upload** — JPEG, PNG, WEBP support up to 20 MB
-- **Deepfake Classification** — Binary prediction with per-class probability scores
+- **Dynamic Custodian Configuration** — Lead Forensic Examiner / Custodian name dynamically passed and logged
+- **Dual Cryptographic Hashing** — Dual MD5 + SHA-256 bitstream checksums with "Bitstream Integrity Verified" badge
+- **Deepfake Classification** — Binary prediction with per-class probability scores (ResNet-18)
 - **Grad-CAM Heatmap** — Visual overlay of convolutional feature activations (what the model "looked at")
-- **2D FFT Spectrum** — Inferno-coloured frequency-domain visualisation
-- **2D DCT Spectrum** — Viridis-coloured coefficient energy map
+- **2D FFT Spectrum** — Inferno-coloured frequency-domain log-magnitude visualisation
+- **2D DCT Spectrum** — Viridis-coloured coefficient energy distribution map
 - **Frequency Metrics** — High-frequency energy ratio, spectral centroid, azimuthal deviation
-- **EXIF Metadata** — Camera make/model, capture timestamp, software tag, anomaly flags
+- **EXIF & Hardware Profiling** — Camera make/model, optics, ISO, exposure, software stamps, and descriptive fallbacks
+- **Stream Introspection** — JPEG SOF0 chroma subsampling (4:2:0/4:2:2/4:4:4) and DQT quantization compression quality (~94%)
+- **Temporal Provenance** — Creation and modification dates with timeline consistency analysis
 
 ### 📊 History & Reports
-- **Audit Log** — Filterable, searchable table of all past analyses
+- **Audit Log** — Filterable, searchable table of all past analyses stored in SQLite
 - **Case Inspection Modal** — Inline detail view with full telemetry breakdown
-- **PDF Export** — Court-style forensic examination reports downloadable per case
-- **Forensic Reports Page** — Centralised list of all generated PDF reports
+- **Court-Admissible PDF Export** — 12-section examination report adhering to ISO/IEC 27037:2012, NIST SP 800-86, FRE 901/902, and 28 U.S.C. § 1746 with 4 embedded photographic exhibits and dynamic two-pass pagination
+- **Forensic Reports Page** — Centralised repository of all generated judicial PDF reports
 
 ---
 
@@ -611,24 +634,21 @@ All endpoints are prefixed with `/api/`. Full interactive documentation availabl
 <table>
   <tr>
     <td align="center">
+      <a href="https://github.com/Soyam08">
+        <img src="https://github.com/Soyam08.png" width="80" style="border-radius:50%"/><br/>
+        <sub><b>Soyam Maji</b></sub>
+      </a><br/>
+      <sub>Forensic Pipeline & Admissibility Engineer</sub>
+    </td>
+    <td align="center">
       <a href="https://github.com/SohamAI99">
         <img src="https://github.com/SohamAI99.png" width="80" style="border-radius:50%"/><br/>
         <sub><b>Soham</b></sub>
       </a><br/>
-      <sub>Lead Developer</sub>
+      <sub>ML & Architecture Engineer</sub>
     </td>
-    <!-- Add more team members below as needed -->
-    <!--
-    <td align="center">
-      <img src="https://via.placeholder.com/80" width="80" style="border-radius:50%"/><br/>
-      <sub><b>Team Member 2</b></sub><br/>
-      <sub>Role</sub>
-    </td>
-    -->
   </tr>
 </table>
-
-> To add team members: replace the placeholder blocks above with your teammates' GitHub usernames and roles.
 
 ---
 
